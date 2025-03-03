@@ -1,0 +1,17 @@
+/Users/juliusuberall/Documents/00_WORK/01_REPOs/COMP0013_GCW/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/GAToUnityCallbacks.h
+/Users/juliusuberall/Documents/00_WORK/01_REPOs/COMP0013_GCW/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/MacroEnd.h
+/Users/juliusuberall/Documents/00_WORK/01_REPOs/COMP0013_GCW/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/MacroHeaderBegin.h
+/Users/juliusuberall/Documents/00_WORK/01_REPOs/COMP0013_GCW/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/MacroSourceBegin.h
+/Users/juliusuberall/Documents/00_WORK/01_REPOs/COMP0013_GCW/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UGAApplication.h
+/Users/juliusuberall/Documents/00_WORK/01_REPOs/COMP0013_GCW/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UGAConfiguration.h
+/Users/juliusuberall/Documents/00_WORK/01_REPOs/COMP0013_GCW/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UGADebug.h
+/Users/juliusuberall/Documents/00_WORK/01_REPOs/COMP0013_GCW/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UGAEvents.h
+/Users/juliusuberall/Documents/00_WORK/01_REPOs/COMP0013_GCW/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UGAInput.h
+/Users/juliusuberall/Documents/00_WORK/01_REPOs/COMP0013_GCW/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UGASoftKeyboard.h
+/Users/juliusuberall/Documents/00_WORK/01_REPOs/COMP0013_GCW/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UGASoftKeyboardCallbacks.h
+/Users/juliusuberall/Documents/00_WORK/01_REPOs/COMP0013_GCW/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UGATypes.h
+/Users/juliusuberall/Documents/00_WORK/01_REPOs/COMP0013_GCW/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UGAVersion.h
+/Users/juliusuberall/Documents/00_WORK/01_REPOs/COMP0013_GCW/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UnityToGACallbacks.h
+/Users/juliusuberall/Documents/00_WORK/01_REPOs/COMP0013_GCW/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UnityToGAConfigurationCallbacks.h
+/Users/juliusuberall/Documents/00_WORK/01_REPOs/COMP0013_GCW/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UnityToGAKeyEventCallbacks.h
+/Users/juliusuberall/Documents/00_WORK/01_REPOs/COMP0013_GCW/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/src/main/cpp/GameActivity/UnityToGAMotionEventCallbacks.h
