@@ -78,7 +78,7 @@ public class FloatingAvatar : MonoBehaviour
             pose = lastGoodHeadPose;
         }
         
-        head.position = pose.value.position;
+        head.position = pose.value.position; 
         head.rotation = pose.value.rotation;        
         lastGoodHeadPose = pose;
     }
