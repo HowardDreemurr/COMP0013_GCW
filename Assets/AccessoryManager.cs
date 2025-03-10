@@ -52,20 +52,8 @@ public class AccessoryManager : MonoBehaviour
         }
 
         // Select a random hat prefab.
-        // BUG: If idx = 0, it creates a duplicate of my avatar and can't seem to despawn the hat from then on
-        // BUG: If idx = 1, I cannot find the head transform anymore (code above returns early)
-        // BUG: If idx != 0 and idx != 1, Unity complains about out of range index
         var idx = Random.Range(0, accessoryCatalogue.prefabs.Count);
-        //var idx = 2;
         GameObject randomHatPrefab = accessoryCatalogue.prefabs[idx];
-
-        // (Optional) Verify that the hat is in the accessory catalogue.
-        // For example, if your catalogue provides a GetIndex() method:
-        // int catalogueIndex = accessoryCatalogue.GetIndex(randomHatPrefab);
-        // if(catalogueIndex < 0) {
-        //     Debug.LogError("Hat prefab not found in accessory catalogue.");
-        //     return;
-        // }
 
         // Spawn the hat as a networked object.
         GameObject newHat = spawner.SpawnWithPeerScope(randomHatPrefab);
