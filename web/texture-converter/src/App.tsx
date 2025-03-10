@@ -1,4 +1,4 @@
-import "./App.css";
+import "./App.scss";
 import MinecraftSkinMapper from "./section/converter";
 import { HeroUIProvider } from "@heroui/react";
 
