@@ -67,7 +67,7 @@ public class FloatingAvatar : MonoBehaviour
 
     private void HeadAndHandsEvents_OnHeadUpdate(InputVar<Pose> pose)
     {
-        Debug.Log("Head update" + pose.valid +"|" +pose.value.position + "|" + pose.value.rotation);
+        // Debug.Log("Head update" + pose.valid +"|" +pose.value.position + "|" + pose.value.rotation);
         if (!pose.valid)
         {
             if (!lastGoodHeadPose.valid)
