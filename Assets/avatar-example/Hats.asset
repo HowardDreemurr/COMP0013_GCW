@@ -12,4 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4467f6c3b47040840ab7f7665d8bddbe, type: 3}
   m_Name: Hats
   m_EditorClassIdentifier: 
-  prefabs: []
+  prefabs:
+  - {fileID: 8569960543600237195, guid: f533da367d91bfd438b494509399962e, type: 3}
+  - {fileID: 6535850847750021467, guid: b44cf0a160552144db216e373c763130, type: 3}
+  - {fileID: 1313001760324490095, guid: b28c50e6a6d504140984e3d3f41f10e3, type: 3}
+  - {fileID: 6810509337882773840, guid: 57817adce271ff64d9e9102f33762206, type: 3}
+  - {fileID: 2825793922822143142, guid: c4314becfefc9d1458245446302cf5f0, type: 3}
+  - {fileID: 6309101130144379336, guid: 87b0d324ec822a24780960cacb3f9759, type: 3}
+  - {fileID: 5389252044661466959, guid: cb421b665f949a94e9bd7ebd43a3ed8c, type: 3}
+  - {fileID: 4689400795552566177, guid: aadbb00df2e77c94990492b2d45dc4f3, type: 3}
+  - {fileID: 1662892104424175740, guid: 96aaac13ebdd6034e86590175e073216, type: 3}
+  - {fileID: 8023954009262472464, guid: 6be3cd3933f2020448d66f1d2cd0c7a8, type: 3}
+  - {fileID: 7035283972579597924, guid: 0fedd4d6240ce0b458af05ad8371659d, type: 3}
+  - {fileID: 2605896548069701262, guid: f52beb653daadd24382f9123cada6dbf, type: 3}
+  - {fileID: 3616864409267320443, guid: f87687e2d8b00e4478d6b89c0f1d0b92, type: 3}
