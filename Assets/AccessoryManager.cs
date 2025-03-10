@@ -20,9 +20,8 @@ public class AccessoryManager : MonoBehaviour
 
     private void Start()
     {
-        spawner = new NetworkSpawner(NetworkScene.Find(this), RoomClient, accessoryCatalogue, "ubiq.accessory.");
-
         var networkScene = NetworkScene.Find(this);
+        spawner = new NetworkSpawner(networkScene, RoomClient, accessoryCatalogue, "ubiq.accessory.");
         avatarManager = networkScene.GetComponentInChildren<AvatarManager>();
     }
 
