@@ -29,7 +29,7 @@ MonoBehaviour:
   SpaceWarp: 0
   TargetQuest2: 1
   TargetQuestPro: 0
-  TargetQuest3: 0
-  TargetQuest3S: 0
+  TargetQuest3: 1
+  TargetQuest3S: 1
   SystemSplashScreen: {fileID: 2800000, guid: 3a66d6006eae544e88184517027c9e9a, type: 3}
   UseStickControlThumbsticks: 0

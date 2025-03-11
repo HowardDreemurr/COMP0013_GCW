@@ -8,12 +8,15 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 1
+  - enabled: 0
     path: Assets/Samples/Ubiq/1.0.0-pre.11/Demo (XRI)/Demo.unity
     guid: 2de505d34345ab340bdde30d419b24eb
+  - enabled: 1
+    path: Assets/avatar-example/Avatar Example.unity
+    guid: 2e0581e857a80de44a4309c477e7c7d0
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: c4bd189f5ea4b4808a0b9525eb605582, type: 2}
-    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: c348712bda248c246b8c49b3db54643f, type: 3}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 3fe23dc26209649ac8a93decab6d5518, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 3990e864132a245c8b2470527e86e347, type: 2}
   m_UseUCBPForAssetBundles: 0
