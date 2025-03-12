@@ -18,14 +18,15 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     private void Update()
     {
-        if (transform.localPosition != lastPosition || transform.localRotation != lastRotation)
+        if (transform.position != lastPosition || transform.rotation != lastRotation)
         {
-            lastPosition = transform.localPosition;
-            lastRotation = transform.localRotation;
+            lastPosition = transform.position;
+            lastRotation = transform.rotation;
+
             context.SendJson(new HatMessage
             {
-                position = transform.localPosition,
-                rotation = transform.localRotation
+                position = transform.position,       // world position
+                rotation = transform.rotation        // world rotation
             });
         }
     }
@@ -33,15 +34,16 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
     public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
     {
         var msg = message.FromJson<HatMessage>();
-        transform.localPosition = msg.position;
-        transform.localRotation = msg.rotation;
-        lastPosition = transform.localPosition;
-        lastRotation = transform.localRotation;
+        transform.position = msg.position;
+        transform.rotation = msg.rotation;
+
+        lastPosition = transform.position;
+        lastRotation = transform.rotation;
     }
 
     private struct HatMessage
     {
-        public Vector3 position;
-        public Quaternion rotation;
+        public Vector3 position;    // global position
+        public Quaternion rotation; // global rotation
     }
 }
