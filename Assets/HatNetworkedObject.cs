@@ -12,8 +12,15 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
     private void Start()
     {
         context = NetworkScene.Register(this);
-        lastPosition = transform.localPosition;
-        lastRotation = transform.localRotation;
+
+        lastPosition = transform.position;
+        lastRotation = transform.rotation;
+
+        context.SendJson(new HatMessage
+        {
+            position = transform.position,       // world position
+            rotation = transform.rotation        // world rotation
+        });
     }
 
     private void Update()
