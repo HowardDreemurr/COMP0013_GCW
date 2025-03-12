@@ -60,7 +60,7 @@ public class AccessoryManager : MonoBehaviour
         newHat.name = "NetworkHat"; // so we can easily find and remove it later
 
         // Parent the hat to the head transform.
-        newHat.transform.SetParent(headTransform, false);
+        newHat.transform.SetParent(headTransform, false); // Other people in the room do not see it parented to the head transform
         newHat.transform.localPosition = Vector3.zero;
         newHat.transform.localRotation = Quaternion.identity;
 
