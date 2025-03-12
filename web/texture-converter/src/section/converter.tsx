@@ -1,10 +1,13 @@
 import React, { useRef, useState } from "react";
 import { Button, Card } from "@heroui/react";
 
+import backgroundImg from "../assets/images/background.png";
+
 const MinecraftSkinMapper: React.FC = () => {
   const [uploadedImageSrc, setUploadedImageSrc] = useState<string | null>(null);
   const [finalTexture, setFinalTexture] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const triggerFileUpload = () => {
     fileInputRef.current?.click();
@@ -201,21 +204,30 @@ const MinecraftSkinMapper: React.FC = () => {
       });
 
       setFinalTexture(finalCanvas.toDataURL("image/png"));
+      setTimeout(() => {
+        containerRef.current?.scrollTo({
+          top: containerRef.current.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 0);
     };
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-col items-center justify-center p-6">
-      <div className="max-w-3xl w-full text-center mb-12">
-        <h1 className="text-6xl font-extrabold text-white mb-4 tracking-wider">
+    <div
+      ref={containerRef}
+      className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-col items-center overflow-auto p-6 absolute w-full h-full"
+    >
+      <div className="max-w-3xl w-full text-center mb-5">
+        <h1 className="text-6xl font-extrabold text-white mb-2 tracking-wider">
           Minecraft Skin Mapper
         </h1>
         <p className="text-xl text-white">
           Transform your Minecraft skin into a custom 1024x1024 avatar texture.
         </p>
       </div>
-      <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
-        <Button onClick={triggerFileUpload} className="w-full mb-2">
+      <div className="bg-white rounded-lg shadow-xl px-8 py-5 w-full max-w-md">
+        <Button onClick={triggerFileUpload} className="w-full">
           Upload Minecraft Skin
         </Button>
         <input
@@ -226,7 +238,7 @@ const MinecraftSkinMapper: React.FC = () => {
           className="hidden"
         />
         {uploadedImageSrc && (
-          <div className="mb-2">
+          <div className="my-2">
             <img
               src={uploadedImageSrc}
               alt="Uploaded Skin"
@@ -235,12 +247,12 @@ const MinecraftSkinMapper: React.FC = () => {
           </div>
         )}
         {uploadedImageSrc && (
-          <Button onClick={generateTexture} className="w-full mb-5">
+          <Button onClick={generateTexture} className="w-full mb-2">
             Generate Custom Texture
           </Button>
         )}
         {finalTexture && (
-          <Card className="mt-4">
+          <Card>
             <img
               src={finalTexture}
               alt="Final Texture"

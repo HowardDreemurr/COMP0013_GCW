@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "SkinMapper",
+  "name": "Minecraft Skin Texture Mapper",
   "icons": [
     {
       "src": "favicon.ico",
@@ -20,6 +20,8 @@
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#4F46E5",
+  "background_color": "#FFFFFF",
+  "description": "Convert Minecraft skins into custom 1024x1024 textures for your avatar.",
+  "orientation": "portrait-primary"
 }
