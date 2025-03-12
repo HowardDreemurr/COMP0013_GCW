@@ -8,18 +8,21 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
     private NetworkContext context;
     private Vector3 lastPosition;
     private Quaternion lastRotation;
+    private bool firstUpdate;
 
     private void Start()
     {
         context = NetworkScene.Register(this);
         lastPosition = transform.localPosition;
         lastRotation = transform.localRotation;
+        firstUpdate = true;
     }
 
     private void Update()
     {
-        if (transform.position != lastPosition || transform.rotation != lastRotation)
+        if (firstUpdate || transform.position != lastPosition || transform.rotation != lastRotation)
         {
+            firstUpdate = false;
             lastPosition = transform.position;
             lastRotation = transform.rotation;
 
