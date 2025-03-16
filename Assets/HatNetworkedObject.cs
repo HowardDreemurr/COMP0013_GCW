@@ -9,6 +9,7 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
     public bool collisionsEnabled;
     public Rigidbody rb;
     public BoxCollider bc;
+    public BoxCollider triggerCollider;
 
     private NetworkContext context;
     private Vector3 lastPosition;
@@ -34,8 +35,13 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
             }
             if (bc == null)
             {
-                gameObject.AddComponent<BoxCollider>();
+                bc = gameObject.AddComponent<BoxCollider>();
             }
+
+            // Create a separate trigger collider for putting the hat on players
+            triggerCollider = gameObject.AddComponent<BoxCollider>();
+            triggerCollider.isTrigger = true;
+            triggerCollider.size *= 1.2f;
         }
     }
 
@@ -52,6 +58,47 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
                 rotation = transform.rotation        // world rotation
             });
         }
+    }
+
+    // TODO: I should put an enumerator on this class specifying slot (hat, back, etc.) and switch behaviour here appropriately
+    private void OnTriggerEnter(Collider other)
+    {
+        if (collisionsEnabled)
+        {
+            Ubiq.Avatars.Avatar avatar = other.GetComponentInParent<Ubiq.Avatars.Avatar>();
+
+            if (avatar != null)
+            {
+                AttachHat(avatar);
+            }
+        }
+    }
+
+    private void AttachHat(Ubiq.Avatars.Avatar avatar)
+    {
+        Debug.Log("Hat attached to " + avatar.name);
+
+        FloatingAvatar floatingAvatar = avatar.GetComponentInChildren<FloatingAvatar>();
+        if (floatingAvatar == null || floatingAvatar.head == null)
+        {
+            Debug.LogWarning("FloatingAvatar component or head transform not found on avatar");
+            return;
+        }
+        Transform headTransform = floatingAvatar.head;
+
+        // Remove any previously attached hat using network despawn
+        Transform existingHat = headTransform.Find("NetworkHat"); // TODO: Append UUID of avatar
+        if (existingHat != null)
+        {
+            Debug.Log("Found an existing hat attached to the avatar\'s head");
+            // TODO: Despawn hat
+        }
+
+        transform.SetParent(headTransform, false);
+        transform.localPosition = Vector3.zero;
+        transform.localRotation = Quaternion.identity;
+
+        DisablePhysics();
     }
 
     public void ProcessMessage(ReferenceCountedSceneGraphMessage message)

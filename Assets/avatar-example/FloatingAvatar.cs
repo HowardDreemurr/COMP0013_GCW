@@ -47,6 +47,20 @@ public class FloatingAvatar : MonoBehaviour
         {
             texturedAvatar.OnTextureChanged.AddListener(TexturedAvatar_OnTextureChanged);
         }
+
+        // Ensure MeshCollider is enabled on head
+        // We'll need this for putting hats on people since the capsule hitbox for avatars is actually a part of something completely separate to avatars
+        if (head != null)
+        {
+            MeshCollider meshCollider = head.GetComponent<MeshCollider>();
+            if (meshCollider == null)
+            {
+                meshCollider = head.gameObject.AddComponent<MeshCollider>();
+            }
+            meshCollider.convex = true; // Ensures it can be a trigger
+            meshCollider.isTrigger = true; // Enables trigger mode
+            meshCollider.enabled = true;
+        }
     }
 
     private void OnDisable()
