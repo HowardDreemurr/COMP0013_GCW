@@ -10,6 +10,7 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
     public Rigidbody rb;
     public BoxCollider bc;
     public BoxCollider triggerCollider;
+    public AccessoryManager accessoryManager; // This is the accessoryManager that spawned this 'hat'
 
     private NetworkContext context;
     private Vector3 lastPosition;
@@ -91,7 +92,7 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
         if (existingHat != null)
         {
             Debug.Log("Found an existing hat attached to the avatar\'s head");
-            // TODO: Despawn hat
+            accessoryManager.headSpawner.Despawn(existingHat.gameObject);
         }
 
         transform.SetParent(headTransform, false);

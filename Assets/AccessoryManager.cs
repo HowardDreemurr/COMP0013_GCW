@@ -9,10 +9,10 @@ public class AccessoryManager : MonoBehaviour
 {
     public RoomClient RoomClient { get; private set; }
 
-    private NetworkSpawner headSpawner;
-    private NetworkSpawner neckSpawner; // TODO
-    private NetworkSpawner backSpawner; // TODO
-    private NetworkSpawner faceSpawner; // TODO
+    public NetworkSpawner headSpawner;
+    public NetworkSpawner neckSpawner; // TODO
+    public NetworkSpawner backSpawner; // TODO
+    public NetworkSpawner faceSpawner; // TODO
 
     public PrefabCatalogue headCatalogue;
     public PrefabCatalogue neckCatalogue;
@@ -74,6 +74,7 @@ public class AccessoryManager : MonoBehaviour
         HatNetworkedObject hatNetworkedObject = newHat.GetComponent<HatNetworkedObject>();
         if (hatNetworkedObject != null)
         {
+            hatNetworkedObject.accessoryManager = this;
             hatNetworkedObject.collisionsEnabled = false;
         }
         else
@@ -95,12 +96,14 @@ public class AccessoryManager : MonoBehaviour
         GameObject randomHatPrefab = headCatalogue.prefabs[idx];
 
         GameObject newHat = headSpawner.SpawnWithPeerScope(randomHatPrefab);
-        newHat.transform.localPosition = new Vector3(1, 1, 1);
+        newHat.transform.localPosition = new Vector3(1, 3, 1);
         newHat.transform.localRotation = Quaternion.identity;
+        newHat.name = "NetworkHat";
 
         HatNetworkedObject hatNetworkedObject = newHat.GetComponent<HatNetworkedObject>();
         if (hatNetworkedObject != null)
         {
+            hatNetworkedObject.accessoryManager = this;
             hatNetworkedObject.collisionsEnabled = true;
         }
         else
