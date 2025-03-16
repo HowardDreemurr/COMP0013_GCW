@@ -8,10 +8,16 @@ using Ubiq.Spawning;
 public class AccessoryManager : MonoBehaviour
 {
     public RoomClient RoomClient { get; private set; }
-    private AvatarManager avatarManager;
-    private NetworkSpawner spawner;
 
-    public PrefabCatalogue accessoryCatalogue;
+    private NetworkSpawner headSpawner;
+    private NetworkSpawner neckSpawner; // TODO
+    private NetworkSpawner backSpawner; // TODO
+    private NetworkSpawner faceSpawner; // TODO
+
+    public PrefabCatalogue headCatalogue;
+    public PrefabCatalogue neckCatalogue;
+    public PrefabCatalogue backCatalogue;
+    public PrefabCatalogue faceCatalogue;
 
     private void Awake()
     {
@@ -21,19 +27,21 @@ public class AccessoryManager : MonoBehaviour
     private void Start()
     {
         var networkScene = NetworkScene.Find(this);
-        spawner = new NetworkSpawner(networkScene, RoomClient, accessoryCatalogue, "ubiq.accessory.");
-        avatarManager = networkScene.GetComponentInChildren<AvatarManager>();
+
+        headSpawner = new NetworkSpawner(networkScene, RoomClient, headCatalogue, "ubiq.head.");
+        neckSpawner = new NetworkSpawner(networkScene, RoomClient, neckCatalogue, "ubiq.neck.");
+        backSpawner = new NetworkSpawner(networkScene, RoomClient, backCatalogue, "ubiq.back.");
+        faceSpawner = new NetworkSpawner(networkScene, RoomClient, faceCatalogue, "ubiq.face.");
     }
 
     public void AttachRandomHat(Ubiq.Avatars.Avatar avatar)
     {
-        // Verify valid inputs.
-        if (accessoryCatalogue.prefabs == null || accessoryCatalogue.prefabs.Count == 0 || avatar == null)
+        if (headCatalogue.prefabs == null || headCatalogue.prefabs.Count == 0 || avatar == null)
         {
             return;
         }
 
-        // Get the FloatingAvatar component that holds the head reference.
+        // Get the FloatingAvatar component that holds the head reference
         FloatingAvatar floatingAvatar = avatar.GetComponentInChildren<FloatingAvatar>();
         if (floatingAvatar == null || floatingAvatar.head == null)
         {
@@ -42,40 +50,62 @@ public class AccessoryManager : MonoBehaviour
         }
         Transform headTransform = floatingAvatar.head;
 
-        // Remove any previously attached hat using network despawn.
-        Transform existingHat = headTransform.Find("NetworkHat");
+        // Remove any previously attached hat using network despawn
+        Transform existingHat = headTransform.Find("NetworkHat"); // TODO: Append UUID of avatar
         if (existingHat != null)
         {
-            // Use the NetworkSpawner's despawn to remove the networked object.
-            spawner.Despawn(existingHat.gameObject);
+            headSpawner.Despawn(existingHat.gameObject);
         }
 
-        // Select a random hat prefab.
-        var idx = Random.Range(0, accessoryCatalogue.prefabs.Count);
-        GameObject randomHatPrefab = accessoryCatalogue.prefabs[idx];
+        // Select a random hat prefab
+        var idx = Random.Range(0, headCatalogue.prefabs.Count);
+        GameObject randomHatPrefab = headCatalogue.prefabs[idx];
 
-        // Spawn the hat as a networked object.
-        GameObject newHat = spawner.SpawnWithPeerScope(randomHatPrefab);
-        
-        newHat.name = "NetworkHat"; // so we can easily find and remove it later
+        // Spawn the hat as a networked object
+        GameObject newHat = headSpawner.SpawnWithPeerScope(randomHatPrefab);
+        newHat.name = "NetworkHat"; // TODO: Append UUID of avatar
 
         // Parent the hat to the head transform.
-        newHat.transform.SetParent(headTransform, false); // Other people in the room do not see it parented to the head transform
+        newHat.transform.SetParent(headTransform, false);
         newHat.transform.localPosition = Vector3.zero;
         newHat.transform.localRotation = Quaternion.identity;
 
-        // Disable any physics so it stays fixed to the head.
-        Rigidbody rb = newHat.GetComponent<Rigidbody>();
-        if (rb != null)
+        // Try to get the HatNetworkedObject component and disable physics
+        HatNetworkedObject hatNetworkedObject = newHat.GetComponent<HatNetworkedObject>();
+        if (hatNetworkedObject != null)
         {
-            rb.isKinematic = true;
+            hatNetworkedObject.collisionsEnabled = false;
+        }
+        else
+        {
+            Debug.LogWarning("HatNetworkedObject component not found on spawned hat.");
         }
 
-        // Disable the Collider
-        Collider col = newHat.GetComponent<Collider>();
-        if (col != null)
+        // TODO: Disable rendering of accessory for avatar it is assigned to
+    }
+
+    public void SpawnRandomHat()
+    {
+        if (headCatalogue.prefabs == null || headCatalogue.prefabs.Count == 0)
         {
-            col.enabled = false;
+            return;
+        }
+
+        var idx = Random.Range(0, headCatalogue.prefabs.Count);
+        GameObject randomHatPrefab = headCatalogue.prefabs[idx];
+
+        GameObject newHat = headSpawner.SpawnWithPeerScope(randomHatPrefab);
+        newHat.transform.localPosition = new Vector3(1, 1, 1);
+        newHat.transform.localRotation = Quaternion.identity;
+
+        HatNetworkedObject hatNetworkedObject = newHat.GetComponent<HatNetworkedObject>();
+        if (hatNetworkedObject != null)
+        {
+            hatNetworkedObject.collisionsEnabled = true;
+        }
+        else
+        {
+            Debug.LogWarning("HatNetworkedObject component not found on spawned hat.");
         }
     }
 }

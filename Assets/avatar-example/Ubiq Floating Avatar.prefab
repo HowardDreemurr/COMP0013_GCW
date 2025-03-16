@@ -48,6 +48,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UpdateRate: 60
+  head: {fileID: 0}
+  neck: {fileID: 0}
+  back: {fileID: 0}
+  face: {fileID: 0}
 --- !u!114 &4093855498690803947
 MonoBehaviour:
   m_ObjectHideFlags: 0

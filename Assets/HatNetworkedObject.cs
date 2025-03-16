@@ -2,9 +2,14 @@ using UnityEngine;
 using Ubiq.Spawning;
 using Ubiq.Messaging;
 
+// NB: This is called 'HatNetworkedObject' as a holdover, it can be thrown onto any accessory, not just hats
 public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
 {
     public NetworkId NetworkId { get; set; }
+    public bool collisionsEnabled;
+    public Rigidbody rb;
+    public BoxCollider bc;
+
     private NetworkContext context;
     private Vector3 lastPosition;
     private Quaternion lastRotation;
@@ -16,11 +21,22 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
         lastPosition = transform.position;
         lastRotation = transform.rotation;
 
-        context.SendJson(new HatMessage
+        if (collisionsEnabled)
         {
-            position = transform.position,       // world position
-            rotation = transform.rotation        // world rotation
-        });
+            rb = GetComponent<Rigidbody>();
+            bc = GetComponent<BoxCollider>();
+
+            if (rb == null)
+            {
+                rb = gameObject.AddComponent<Rigidbody>();
+                rb.useGravity = true;
+                rb.isKinematic = false;
+            }
+            if (bc == null)
+            {
+                gameObject.AddComponent<BoxCollider>();
+            }
+        }
     }
 
     private void Update()
@@ -46,6 +62,15 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
 
         lastPosition = transform.position;
         lastRotation = transform.rotation;
+    }
+
+    public void DisablePhysics()
+    {
+        if (rb != null)
+        {
+            rb.isKinematic = true;
+            rb.detectCollisions = false;
+        }
     }
 
     private struct HatMessage

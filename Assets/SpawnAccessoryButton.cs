@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
-public class ChangeAccessory : MonoBehaviour
+public class SpawnAccessoryButton : MonoBehaviour
 {
     private XRSimpleInteractable interactable;
     private RoomClient roomClient;
@@ -33,19 +33,6 @@ public class ChangeAccessory : MonoBehaviour
 
     private void OnSelectEntered(SelectEnterEventArgs args)
     {
-        Debug.Log("Entering OnSelectEntered");
-
-        // Get the local avatar using the RoomClient's peer
-        var avatar = avatarManager.FindAvatar(roomClient.Me);
-        if (avatar)
-        {
-            accessoryManager.AttachRandomHat(avatar);
-        }
-        else
-        {
-            Debug.LogWarning("Local avatar not found!");
-        }
-
-        Debug.Log("Leaving OnSelectEntered");
+        accessoryManager.SpawnRandomHat();
     }
 }
