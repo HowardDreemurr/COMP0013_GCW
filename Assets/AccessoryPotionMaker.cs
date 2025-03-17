@@ -1,11 +1,9 @@
-using Ubiq.Spawning;
-using UnityEditor.UIElements;
 using UnityEngine;
+using Ubiq.Spawning;
 using Ubiq.Messaging;
 
-public class AccessoryPotionMaker : MonoBehaviour, INetworkSpawnable
+public class AccessoryPotionMaker : MonoBehaviour
 {
-    public NetworkId NetworkId { get; set; }
     public BoxCollider triggerCollider;
 
     [SerializeField] private AccessoryManager accessoryManager;
@@ -31,7 +29,6 @@ public class AccessoryPotionMaker : MonoBehaviour, INetworkSpawnable
             Debug.LogWarning("AccessoryManager reference not set in inspector! (AccessoryPotionMaker)");
         }
 
-        NetworkId = new NetworkId((uint)gameObject.GetInstanceID());
         context = NetworkScene.Register(this);
 
         triggerCollider = gameObject.AddComponent<BoxCollider>();
@@ -46,13 +43,7 @@ public class AccessoryPotionMaker : MonoBehaviour, INetworkSpawnable
     // Update is called once per frame
     void Update()
     {
-        timer += Time.deltaTime;
 
-        if (timer >= logInterval)
-        {
-            Debug.Log("Head: " + accessories.head + " Neck: " + accessories.neck + " Back: " + accessories.back + " Face: " + accessories.face);
-            timer = 0f;
-        }
     }
 
     private void OnTriggerEnter(Collider other)
