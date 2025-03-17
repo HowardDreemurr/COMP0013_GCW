@@ -41,48 +41,23 @@ public class AccessoryManager : MonoBehaviour
             return;
         }
 
-        // Get the FloatingAvatar component that holds the head reference
-        FloatingAvatar floatingAvatar = avatar.GetComponentInChildren<FloatingAvatar>();
-        if (floatingAvatar == null || floatingAvatar.head == null)
-        {
-            Debug.LogWarning("FloatingAvatar component or head transform not found on avatar");
-            return;
-        }
-        Transform headTransform = floatingAvatar.head;
-
-        // Remove any previously attached hat using network despawn
-        Transform existingHat = headTransform.Find("NetworkHat"); // TODO: Append UUID of avatar
-        if (existingHat != null)
-        {
-            headSpawner.Despawn(existingHat.gameObject);
-        }
-
-        // Select a random hat prefab
         var idx = Random.Range(0, headCatalogue.prefabs.Count);
         GameObject randomHatPrefab = headCatalogue.prefabs[idx];
 
-        // Spawn the hat as a networked object
         GameObject newHat = headSpawner.SpawnWithPeerScope(randomHatPrefab);
-        newHat.name = "NetworkHat"; // TODO: Append UUID of avatar
+        newHat.name = "NetworkHat";
 
-        // Parent the hat to the head transform.
-        newHat.transform.SetParent(headTransform, false);
-        newHat.transform.localPosition = Vector3.zero;
-        newHat.transform.localRotation = Quaternion.identity;
-
-        // Try to get the HatNetworkedObject component and disable physics
-        HatNetworkedObject hatNetworkedObject = newHat.GetComponent<HatNetworkedObject>();
-        if (hatNetworkedObject != null)
+        HatNetworkedObject newHatNetObj = newHat.GetComponent<HatNetworkedObject>();
+        if (newHatNetObj != null)
         {
-            hatNetworkedObject.accessoryManager = this;
-            hatNetworkedObject.collisionsEnabled = false;
+            newHatNetObj.accessoryManager = this;
+            newHatNetObj.collisionsEnabled = false;
+            newHatNetObj.AttachHat(avatar);
         }
         else
         {
             Debug.LogWarning("HatNetworkedObject component not found on spawned hat.");
         }
-
-        // TODO: Disable rendering of accessory for avatar it is assigned to
     }
 
     public void SpawnRandomHat()

@@ -1,6 +1,13 @@
 using UnityEngine;
 using Ubiq.Spawning;
 using Ubiq.Messaging;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
+using UnityEngine.XR.Interaction.Toolkit;
+#if XRI_3_0_7_OR_NEWER
+using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
+using UnityEngine.XR.Interaction.Toolkit.Interactors;
+#endif
 
 // NB: This is called 'HatNetworkedObject' as a holdover, it can be thrown onto any accessory, not just hats
 public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
@@ -23,27 +30,45 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
         lastPosition = transform.position;
         lastRotation = transform.rotation;
 
-        if (collisionsEnabled)
+        Debug.Log("Adding Rigid Body and Box Collider to hat");
+        rb = GetComponent<Rigidbody>();
+        bc = GetComponent<BoxCollider>();
+
+        if (rb == null)
         {
-            rb = GetComponent<Rigidbody>();
-            bc = GetComponent<BoxCollider>();
-
-            if (rb == null)
-            {
-                rb = gameObject.AddComponent<Rigidbody>();
-                rb.useGravity = true;
-                rb.isKinematic = false;
-            }
-            if (bc == null)
-            {
-                bc = gameObject.AddComponent<BoxCollider>();
-            }
-
-            // Create a separate trigger collider for putting the hat on players
-            triggerCollider = gameObject.AddComponent<BoxCollider>();
-            triggerCollider.isTrigger = true;
-            triggerCollider.size *= 1.2f;
+            rb = gameObject.AddComponent<Rigidbody>();
+            rb.useGravity = true;
+            rb.isKinematic = false;
         }
+        if (bc == null)
+        {
+            bc = gameObject.AddComponent<BoxCollider>();
+        }
+
+        // Create a separate trigger collider for putting the hat on players
+        triggerCollider = gameObject.AddComponent<BoxCollider>();
+        triggerCollider.isTrigger = true;
+        triggerCollider.size *= 1.2f;
+
+        if (!collisionsEnabled)
+        {
+            DisablePhysics();
+        }
+
+        // Grabbing
+        var grab = gameObject.GetComponent<XRGrabInteractable>();
+        if (!grab)
+        {
+            grab = gameObject.AddComponent<XRGrabInteractable>();
+        }
+        grab.selectEntered.AddListener((SelectEnterEventArgs args) =>
+        {
+            Debug.Log("Hat was selected!");
+        });
+        grab.selectExited.AddListener((SelectExitEventArgs args) =>
+        {
+            Debug.Log("Hat was dropped!");
+        });
     }
 
     private void Update()
@@ -75,7 +100,7 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
         }
     }
 
-    private void AttachHat(Ubiq.Avatars.Avatar avatar)
+    public void AttachHat(Ubiq.Avatars.Avatar avatar)
     {
         Debug.Log("Hat attached to " + avatar.name);
 
