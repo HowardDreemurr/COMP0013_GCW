@@ -30,6 +30,7 @@ public class AccessoryPotionMaker : MonoBehaviour
         }
 
         context = NetworkScene.Register(this);
+        Debug.Log($"{name} on {UnityEngine.SystemInfo.deviceName} has ID {context.Id}");
 
         triggerCollider = gameObject.AddComponent<BoxCollider>();
         triggerCollider.isTrigger = true;
