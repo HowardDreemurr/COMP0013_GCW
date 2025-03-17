@@ -18,6 +18,7 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
     public BoxCollider bc;
     public BoxCollider triggerCollider;
     public AccessoryManager accessoryManager; // This is the accessoryManager that spawned this 'hat'
+    public int idx;
 
     private NetworkContext context;
     private Vector3 lastPosition;

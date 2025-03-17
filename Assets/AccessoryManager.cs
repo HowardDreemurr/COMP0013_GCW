@@ -53,6 +53,7 @@ public class AccessoryManager : MonoBehaviour
             newHatNetObj.accessoryManager = this;
             newHatNetObj.collisionsEnabled = false;
             newHatNetObj.AttachHat(avatar);
+            newHatNetObj.idx = idx;
         }
         else
         {
@@ -80,6 +81,7 @@ public class AccessoryManager : MonoBehaviour
         {
             hatNetworkedObject.accessoryManager = this;
             hatNetworkedObject.collisionsEnabled = true;
+            hatNetworkedObject.idx = idx;
         }
         else
         {
