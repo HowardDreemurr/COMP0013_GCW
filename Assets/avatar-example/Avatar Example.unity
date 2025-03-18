@@ -1321,9 +1321,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3880192299337156673, guid: 76f3439a0ae796e4b81bee3f91f888ee, type: 3}
       insertIndex: -1
       addedObject: {fileID: 898415383}
-    - targetCorrespondingSourceObject: {fileID: 3880192299337156673, guid: 76f3439a0ae796e4b81bee3f91f888ee, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1290700505}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 4922582553321831162, guid: 76f3439a0ae796e4b81bee3f91f888ee, type: 3}
       insertIndex: 1
@@ -1868,7 +1865,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 2028206589}
+    m_TransformParent: {fileID: 13807068}
     m_Modifications:
     - target: {fileID: 377291013443947822, guid: 76f3439a0ae796e4b81bee3f91f888ee, type: 3}
       propertyPath: m_PokeFilter
@@ -1892,15 +1889,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4616165200164398447, guid: 76f3439a0ae796e4b81bee3f91f888ee, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.56
+      value: 1.9360001
       objectReference: {fileID: 0}
     - target: {fileID: 4616165200164398447, guid: 76f3439a0ae796e4b81bee3f91f888ee, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.1
+      value: 0.574
       objectReference: {fileID: 0}
     - target: {fileID: 4616165200164398447, guid: 76f3439a0ae796e4b81bee3f91f888ee, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 10.4
+      value: 6.041
       objectReference: {fileID: 0}
     - target: {fileID: 4616165200164398447, guid: 76f3439a0ae796e4b81bee3f91f888ee, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1932,7 +1929,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4922582553321831162, guid: 76f3439a0ae796e4b81bee3f91f888ee, type: 3}
       propertyPath: m_Name
-      value: Accessory Button
+      value: Accessory Cauldron Button
+      objectReference: {fileID: 0}
+    - target: {fileID: 4922582553321831162, guid: 76f3439a0ae796e4b81bee3f91f888ee, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5419331889293473514, guid: 76f3439a0ae796e4b81bee3f91f888ee, type: 3}
       propertyPath: m_SelectEntered.m_PersistentCalls.m_Calls.Array.size
@@ -3011,12 +3012,12 @@ GameObject:
   - component: {fileID: 1973129880}
   - component: {fileID: 1973129884}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: Accessory Potion Maker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1973129880
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4086,6 +4087,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3723249095139361141, guid: 73369a530bd8253469d623a3ea6dcff9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1973129883}
+    - targetCorrespondingSourceObject: {fileID: 3723249095139361141, guid: 73369a530bd8253469d623a3ea6dcff9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1290700505}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 73369a530bd8253469d623a3ea6dcff9, type: 3}
 --- !u!1660057539 &9223372036854775807
