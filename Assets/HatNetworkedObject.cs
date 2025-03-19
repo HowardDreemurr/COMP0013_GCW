@@ -3,11 +3,6 @@ using Ubiq.Spawning;
 using Ubiq.Messaging;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit;
-#if XRI_3_0_7_OR_NEWER
-using UnityEngine.XR.Interaction.Toolkit;
-using UnityEngine.XR.Interaction.Toolkit.Interactables;
-using UnityEngine.XR.Interaction.Toolkit.Interactors;
-#endif
 
 // NB: This is called 'HatNetworkedObject' as a holdover, it can be thrown onto any accessory, not just hats
 public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable

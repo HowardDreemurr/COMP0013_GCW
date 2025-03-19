@@ -18,6 +18,11 @@ public class AccessoryCauldronButton : MonoBehaviour
     [SerializeField] private AccessoryPotionMaker accessoryPotionMaker;
     private XRSimpleInteractable interactable;
 
+    private void Awake()
+    {
+        RoomClient = GetComponentInParent<RoomClient>();
+    }
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
