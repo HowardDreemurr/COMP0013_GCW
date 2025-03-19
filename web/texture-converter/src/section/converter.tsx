@@ -1,11 +1,12 @@
-import React, { useRef, useState } from "react";
-import { Button, Card } from "@heroui/react";
+import React, { useEffect, useRef, useState } from "react";
+import { Button, Card, Switch } from "@heroui/react";
 
-import backgroundImg from "../assets/images/background.png";
+import maskImg from "../assets/images/texture_mask.png";
 
 const MinecraftSkinMapper: React.FC = () => {
   const [uploadedImageSrc, setUploadedImageSrc] = useState<string | null>(null);
   const [finalTexture, setFinalTexture] = useState<string | null>(null);
+  const [applyMask, setApplyMask] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -204,6 +205,29 @@ const MinecraftSkinMapper: React.FC = () => {
       });
 
       setFinalTexture(finalCanvas.toDataURL("image/png"));
+
+      if (applyMask) {
+        const finalImage = new Image();
+        finalImage.crossOrigin = "Anonymous";
+        finalImage.src = finalCanvas.toDataURL("image/png");
+        finalImage.onload = () => {
+          const maskImageElement = new Image();
+          maskImageElement.crossOrigin = "Anonymous";
+          maskImageElement.src = maskImg;
+          maskImageElement.onload = () => {
+            const maskedCanvas = document.createElement("canvas");
+            maskedCanvas.width = 1024;
+            maskedCanvas.height = 1024;
+            const mCtx = maskedCanvas.getContext("2d");
+            if (!mCtx) return;
+            mCtx.drawImage(finalImage, 0, 0, 1024, 1024);
+            mCtx.globalCompositeOperation = "destination-in";
+            mCtx.drawImage(maskImageElement, 0, 0, 1024, 1024);
+            setFinalTexture(maskedCanvas.toDataURL("image/png"));
+          };
+        };
+      }
+
       setTimeout(() => {
         containerRef.current?.scrollTo({
           top: containerRef.current.scrollHeight,
@@ -212,6 +236,10 @@ const MinecraftSkinMapper: React.FC = () => {
       }, 0);
     };
   };
+
+  useEffect(() => {
+    generateTexture();
+  }, [applyMask]);
 
   return (
     <div
@@ -243,6 +271,7 @@ const MinecraftSkinMapper: React.FC = () => {
               src={uploadedImageSrc}
               alt="Uploaded Skin"
               className="w-full rounded-md shadow-sm"
+              style={{ imageRendering: "pixelated" }}
             />
           </div>
         )}
@@ -252,17 +281,25 @@ const MinecraftSkinMapper: React.FC = () => {
           </Button>
         )}
         {finalTexture && (
-          <Card>
+          <div className="bg-white rounded-lg shadow-xl px-8 py-5 w-full max-w-md flex flex-col">
             <img
               src={finalTexture}
               alt="Final Texture"
               className="w-full rounded mb-2"
             />
-
+            {finalTexture && (
+              <Switch
+                checked={applyMask}
+                onChange={() => setApplyMask(!applyMask)}
+                className="mb-2"
+              >
+                Ghosted
+              </Switch>
+            )}
             <Button as="a" href={finalTexture} download="custom_texture.png">
               Download Texture
             </Button>
-          </Card>
+          </div>
         )}
       </div>
     </div>
