@@ -70,8 +70,13 @@ public class TestChangeSkin : MonoBehaviour
                 var textured = avatar.GetComponentInChildren<TexturedAvatar>();
                 if (textured)
                 {
-                    textured.SetCustomTexture(this.texture);
-                    
+                    if (TextureMixer.Instance != null)
+                    {
+                        Texture2D mixedTexture = TextureMixer.Instance.GetMixedTexture();
+                        textured.SetCustomTexture(mixedTexture);
+                        Debug.Log("[TestChangeSkin] Skin Changed!");
+                    }
+
                     // End the coroutine.
                     yield break;
                 }

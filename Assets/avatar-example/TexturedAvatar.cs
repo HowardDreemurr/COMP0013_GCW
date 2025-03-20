@@ -146,8 +146,8 @@ public class TexturedAvatar : MonoBehaviour
 
             if (avatar.IsLocal)
             {
-                roomClient.Me["ubiq.avatar.texture.uuid"] = this.uuid;
                 roomClient.Me["ubiq.avatar.texture.blob"] = null;
+                roomClient.Me["ubiq.avatar.texture.uuid"] = this.uuid;
             }
 
             if (avatar.IsLocal && SaveTextureSetting)

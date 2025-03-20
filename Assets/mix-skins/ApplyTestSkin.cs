@@ -15,6 +15,7 @@ public class ApplyTestSkin : MonoBehaviour
     private XRSimpleInteractable interactable;
     private RoomClient roomClient;
     private AvatarManager avatarManager;
+    private TextureMixer textureMixer;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -26,6 +27,13 @@ public class ApplyTestSkin : MonoBehaviour
         var networkScene = NetworkScene.Find(this);
         roomClient = networkScene.GetComponentInChildren<RoomClient>();
         avatarManager = networkScene.GetComponentInChildren<AvatarManager>();
+
+        textureMixer = TextureMixer.Instance;
+
+        if (textureMixer == null)
+        {
+            Debug.LogError("TextureMixer Instance Not Found!");
+        }
 
     }
 
@@ -69,9 +77,12 @@ public class ApplyTestSkin : MonoBehaviour
                 var textured = avatar.GetComponentInChildren<TexturedAvatar>();
                 if (textured)
                 {
-                    Texture2D newTexture = LoadTextureFromFile(Application.dataPath + "/avatar-example/my_texture_1.png");
-                    // Set the random color.
-                    textured.SetCustomTexture(newTexture);
+                    //Texture2D newTexture = LoadTextureFromFile(Application.dataPath + "/avatar-example/my_texture_1.png");
+                    Texture2D newTexture = textured.GetTexture();
+                    if (textureMixer != null)
+                    {
+                        textureMixer.AddIngredient(newTexture);
+                    }
 
                     // End the coroutine.
                     yield break;
