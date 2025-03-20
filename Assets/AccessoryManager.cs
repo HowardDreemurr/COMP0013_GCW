@@ -65,6 +65,7 @@ public class AccessoryManager : MonoBehaviour
     {
         if (headCatalogue.prefabs == null || headCatalogue.prefabs.Count == 0)
         {
+            Debug.Log("SpawnRandomHat call invalid");
             return;
         }
 
@@ -87,5 +88,35 @@ public class AccessoryManager : MonoBehaviour
         {
             Debug.LogWarning("HatNetworkedObject component not found on spawned hat.");
         }
+    }
+
+    public HatNetworkedObject SpawnHat(int idx, bool collisions)
+    {
+        if (idx < 0 || headCatalogue.prefabs == null || idx > (headCatalogue.prefabs.Count-1))
+        {
+            Debug.Log("SpawnHat call invalid");
+            return null;
+        }
+
+        GameObject hatPrefab = headCatalogue.prefabs[idx];
+
+        GameObject hat = headSpawner.SpawnWithPeerScope(hatPrefab);
+        hat.transform.localPosition = new Vector3(1, 3, 1);
+        hat.transform.localRotation = Quaternion.identity;
+        hat.name = "NetworkHat";
+
+        HatNetworkedObject hatNetworkedObject = hat.GetComponent<HatNetworkedObject>();
+        if (hatNetworkedObject != null)
+        {
+            hatNetworkedObject.accessoryManager = this;
+            hatNetworkedObject.collisionsEnabled = collisions;
+            hatNetworkedObject.idx = idx;
+        }
+        else
+        {
+            Debug.LogWarning("HatNetworkedObject component not found on spawned hat.");
+        }
+
+        return hatNetworkedObject;
     }
 }

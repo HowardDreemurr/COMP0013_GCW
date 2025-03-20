@@ -3,6 +3,8 @@ using Ubiq.Spawning;
 using Ubiq.Messaging;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit;
+using NUnit.Framework;
+using System.Collections.Generic;
 
 public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
 {
@@ -16,13 +18,21 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
     public float expansionDuration = 5f;
     public float expansionSize = 10f;
     private float timer = 0f;
+
+
+    private bool smashed = false;
     private bool expanding = false;
     public bool destroyed = false;
+
+    private List<string> affectedAvatars = new List<string>();
+
     private Vector3 initialSize;
 
     public AccessoryManager accessoryManager; // Injected by design-time button that holds reference to accessoryManager
 
     private NetworkContext context;
+    private Vector3 lastPosition;
+    private Quaternion lastRotation;
 
     public struct Accessories
     {
@@ -84,6 +94,27 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
     // Update is called once per frame
     void Update()
     {
+        if (destroyed) return;
+
+        if (transform.position != lastPosition || transform.rotation != lastRotation)
+        {
+            lastPosition = transform.position;
+            lastRotation = transform.rotation;
+
+            context.SendJson(new TransformMessage
+            {
+                position = transform.position,
+                rotation = transform.rotation,
+                smashed = false
+            });
+        }
+
+        if (smashed && !expanding)
+        {
+            // The potion smashed on someone elses client but not our one - take their word for it
+            SmashPotion();
+        }
+
         if (expanding)
         {
             timer += Time.deltaTime;
@@ -91,7 +122,6 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             if (timer >= expansionDuration)
             {
                 Debug.Log("Potion stopped expanding");
-                expanding = false;
                 destroyed = true;
             }
         }
@@ -118,11 +148,19 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
         }
         if (expanding)
         {
+            Debug.Log($"OnTriggerEnter called by collider: {other.gameObject.name}");
             Ubiq.Avatars.Avatar avatar = other.GetComponentInParent<Ubiq.Avatars.Avatar>();
 
-            if (avatar != null)
+            if (avatar != null && !affectedAvatars.Contains(avatar.name))
             {
                 Debug.Log("Potion touched avatar " + avatar.name);
+                // TODO: Switch on HatNetworkedObject.slot
+                var hat = accessoryManager.SpawnHat(accessories.head, false);
+                if (hat != null)
+                {
+                    hat.AttachHat(avatar);
+                    affectedAvatars.Add(avatar.name); // don't apply to this avatar again or else it just freezes the game
+                }
             }
         }
     }
@@ -156,6 +194,13 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
         collisionsEnabled = false;
 
         triggerCollider.size = initialSize * expansionSize;
+
+        context.SendJson(new TransformMessage
+        {
+            position = transform.position,
+            rotation = transform.rotation,
+            smashed = true
+        });
     }
 
     void OnDrawGizmos()
@@ -168,8 +213,26 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
         }
     }
 
+    private struct TransformMessage
+    {
+        public Vector3 position;
+        public Quaternion rotation;
+        public bool smashed;
+    }
+
     public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
     {
-        
+        var msg = message.FromJson<TransformMessage>();
+        transform.position = msg.position;
+        transform.rotation = msg.rotation;
+
+        lastPosition = transform.position;
+        lastRotation = transform.rotation;
+
+        if (msg.smashed && !expanding)
+        {
+            smashed = true;
+            // If !msg.smashed, just keep it as is; we want to hold true until we finish calling SmashPotion locally
+        }
     }
 }
