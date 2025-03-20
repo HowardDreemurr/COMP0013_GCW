@@ -5,6 +5,7 @@ using UnityEngine;
 using Avatar = Ubiq.Avatars.Avatar;
 using Ubiq.Rooms;
 using Ubiq.Messaging;
+using System.Collections;
 
 /// <summary>
 /// This class sets the avatar to use a specific texture. It also handles
@@ -22,8 +23,7 @@ public class TexturedAvatar : MonoBehaviour
 
     private Avatar avatar;
     private string uuid;
-    private string blob_uuid;
-    private string blob_skin;
+    private string blob;
     private RoomClient roomClient;
 
     private Texture2D cached; // Cache for GetTexture. Do not do anything else with this; use the uuid
@@ -31,7 +31,7 @@ public class TexturedAvatar : MonoBehaviour
     private void Start()
     {
         roomClient = NetworkScene.Find(this).GetComponentInChildren<RoomClient>();
-        
+
         avatar = GetComponent<Avatar>();
 
         if (avatar.IsLocal)
@@ -46,7 +46,7 @@ public class TexturedAvatar : MonoBehaviour
                 SetTexture(Textures.Get(UnityEngine.Random.Range(0, Textures.Count)));
             }
         }
-        
+
         roomClient.OnPeerUpdated.AddListener(RoomClient_OnPeerUpdated);
     }
 
@@ -62,18 +62,18 @@ public class TexturedAvatar : MonoBehaviour
 
     void RoomClient_OnPeerUpdated(IPeer peer)
     {
-        if (peer != avatar.Peer && avatar.IsLocal)
+        if (peer != avatar.Peer)
         {
             // The peer who is being updated is not our peer, so we can safely
             // ignore this event.
             return;
         }
-        if (!string.IsNullOrWhiteSpace(peer["ubiq.avatar.texture.blob_uuid"]))
+        if (!string.IsNullOrWhiteSpace(peer["ubiq.avatar.texture.blob"]))
         {
-            Debug.Log("[TA][RCOPU] Updating Blob...");
-            //SetCustomTexture(peer["ubiq.avatar.texture.blob_uuid"]);
-            Debug.Log("[TA][RCOPU] Updated!");
-        } else {
+            SetCustomTexture(peer["ubiq.avatar.texture.blob"]);
+        }
+        else
+        {
             SetTexture(peer["ubiq.avatar.texture.uuid"]);
         }
     }
@@ -81,60 +81,41 @@ public class TexturedAvatar : MonoBehaviour
     // The method is LOCAL, use SetCustomTexture for custom skin swampping.
     public void SetCustomTextureTest(Texture2D texture)
     {
-        Debug.Log("[TA][SCTt] Changing Custom Texture...");
-        OnTextureChanged.Invoke(texture);
-        Debug.Log("[TA][SCTt] Custom Texture Changed.");
+        roomClient.Me["ubiq.avatar.texture.blob"] = Texture2DToBase64(texture);
     }
 
 
     public void SetCustomTexture(Texture2D texture)
-    {   Debug.Log("[TA][SCT] Changing Custom Texture...");
-        OnTextureChanged.Invoke(texture);
-        Debug.Log("[TA][SCT] Texture Changed!");
-        this.cached = texture;
-        this.blob_skin = Texture2DToBase64(texture);
-        Debug.Log(this.blob_skin);
-        if(avatar.IsLocal)
-        {
-            this.blob_uuid = roomClient.SetBlob(roomClient.Room.UUID, blob_skin);
-            Debug.Log(this.blob_uuid);
-            roomClient.Me["ubiq.avatar.texture.blob_uuid"] = this.blob_uuid;
-        }
-        
-        if (avatar.IsLocal && SaveTextureSetting)
-        {
-            SaveSettings();
-        }
-
+    {
+        SetCustomTexture(Texture2DToBase64(texture));
     }
 
-    public void SetCustomTexture(string blob_uuid)
-    {   
-        this.blob_uuid = blob_uuid;
-        Debug.Log(this.blob_uuid);
-        roomClient.GetBlob(roomClient.Room.UUID, blob_uuid, (blob_data) => 
+    public void SetCustomTexture(string blob)
+    {
+        if (String.IsNullOrWhiteSpace(blob))
         {
-            Debug.Log("[TA]BLOB STARTING FECTING");
-            Debug.Log(blob_data);
-            SetCustomTexture(Base64ToTexture2D(blob_data));
+            return;
+        }
 
-        });
-    }
-
-    public void SetCustomTexture(string blob_uuid, string blob_skin)
-    {   
-        roomClient.GetBlob(roomClient.Room.UUID, blob_uuid, (blob_data) => 
+        if (this.blob != blob)
         {
-            if (blob_skin == blob_data) {
-                Texture2D texture = Base64ToTexture2D(blob_data);
-                OnTextureChanged.Invoke(texture);
-                this.cached = texture;
-                roomClient.Me["ubiq.avatar.texture.blob_uuid"] = this.blob_uuid;
-            } else {
-                SetCustomTexture(Base64ToTexture2D(blob_data));
+            this.blob = blob;
+            this.cached = Base64ToTexture2D(blob);
+
+            OnTextureChanged.Invoke(this.cached);
+
+            if (avatar.IsLocal)
+            {
+                roomClient.Me["ubiq.avatar.texture.blob"] = blob;
             }
-        });
+
+            if (avatar.IsLocal && SaveTextureSetting)
+            {
+                SaveSettings();
+            }
+        }
     }
+
 
     /// <summary>
     /// Try to set the Texture by reference to a Texture in the Catalogue. If the Texture is not in the
@@ -149,7 +130,7 @@ public class TexturedAvatar : MonoBehaviour
 
     public void SetTexture(string uuid)
     {
-        if(String.IsNullOrWhiteSpace(uuid))
+        if (String.IsNullOrWhiteSpace(uuid))
         {
             return;
         }
@@ -158,13 +139,12 @@ public class TexturedAvatar : MonoBehaviour
         {
             var texture = Textures.Get(uuid);
             this.uuid = uuid;
-            this.blob_uuid = null;
-            this.blob_skin = null;
+            this.blob = null;
             this.cached = texture;
 
             OnTextureChanged.Invoke(texture);
 
-            if(avatar.IsLocal)
+            if (avatar.IsLocal)
             {
                 roomClient.Me["ubiq.avatar.texture.uuid"] = this.uuid;
             }
@@ -179,22 +159,23 @@ public class TexturedAvatar : MonoBehaviour
     private void SaveSettings()
     {
         PlayerPrefs.SetString("ubiq.avatar.texture.uuid", uuid);
-        PlayerPrefs.SetString("ubiq.avatar.texture.blob_uuid", blob_uuid);
-        PlayerPrefs.SetString("ubiq.avatar.texture.blob_uuid", blob_skin);
+        PlayerPrefs.SetString("ubiq.avatar.texture.blob", blob);
     }
 
     private bool LoadSettings()
     {
         var uuid = PlayerPrefs.GetString("ubiq.avatar.texture.uuid", "");
-        var blob_uuid = PlayerPrefs.GetString("ubiq.avatar.texture.blob_uuid", "");
-        var blob_skin = PlayerPrefs.GetString("ubiq.avatar.texture.blob_skin", "");
-        if (!string.IsNullOrWhiteSpace(blob_uuid))
+        var blob = PlayerPrefs.GetString("ubiq.avatar.texture.blob", "");
+
+        if (!string.IsNullOrWhiteSpace(blob))
         {
-            SetCustomTexture(blob_uuid, blob_skin);
-        } else {
+            SetCustomTexture(blob);
+        }
+        else
+        {
             SetTexture(uuid);
         }
-        return !string.IsNullOrWhiteSpace(uuid) || !string.IsNullOrWhiteSpace(blob_uuid);
+        return !string.IsNullOrWhiteSpace(uuid) || !string.IsNullOrWhiteSpace(blob);
     }
 
     public void ClearSettings()
@@ -222,3 +203,4 @@ public class TexturedAvatar : MonoBehaviour
         return base64;
     }
 }
+
