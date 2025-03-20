@@ -46,7 +46,7 @@ public class ApplyTestSkin : MonoBehaviour
         // Change the local avatar prefab to the default one, because we have
         // a few costumes for that avatar bundled with Ubiq. The AvatarManager
         // will do the work of letting other peers know about the prefab change.
-
+        avatarManager.avatarPrefab = prefab;
         // Also, set the costume to a new, random one. We use a coroutine to
         // wait one frame to allow the AvatarManager time to spawn the new
         // prefab.
