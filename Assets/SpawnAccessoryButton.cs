@@ -12,6 +12,8 @@ public class SpawnAccessoryButton : MonoBehaviour
     private AvatarManager avatarManager;
     private AccessoryManager accessoryManager;
 
+    public AccessorySlot slot; // Determines which slot this button will spawn
+
     private void Start()
     {
         interactable = GetComponent<XRSimpleInteractable>();
@@ -33,6 +35,6 @@ public class SpawnAccessoryButton : MonoBehaviour
 
     private void OnSelectEntered(SelectEnterEventArgs args)
     {
-        accessoryManager.SpawnRandomHat();
+        accessoryManager.SpawnRandomHat(slot);
     }
 }

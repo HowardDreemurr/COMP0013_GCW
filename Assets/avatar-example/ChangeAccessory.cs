@@ -12,6 +12,8 @@ public class ChangeAccessory : MonoBehaviour
     private AvatarManager avatarManager;
     private AccessoryManager accessoryManager;
 
+    public AccessorySlot slot; // Determines which slot this button will spawn
+
     private void Start()
     {
         interactable = GetComponent<XRSimpleInteractable>();
@@ -35,11 +37,10 @@ public class ChangeAccessory : MonoBehaviour
     {
         Debug.Log("Entering OnSelectEntered");
 
-        // Get the local avatar using the RoomClient's peer
         var avatar = avatarManager.FindAvatar(roomClient.Me);
         if (avatar)
         {
-            accessoryManager.AttachRandomHat(avatar);
+            accessoryManager.AttachRandomHat(avatar, slot);
         }
         else
         {

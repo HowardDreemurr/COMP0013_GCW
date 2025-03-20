@@ -15,9 +15,21 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
     public AccessoryManager accessoryManager; // This is the accessoryManager that spawned this 'hat'
     public int idx;
 
+    public AccessorySlot slot;
+
     private NetworkContext context;
     private Vector3 lastPosition;
     private Quaternion lastRotation;
+
+    private Vector3 initTranslation;
+    private Quaternion initRotation;
+
+    void Awake()
+    {
+        // Store the initial transform values when the GameObject is first instantiated
+        initTranslation = transform.position;
+        initRotation = transform.rotation;
+    }
 
     private void Start()
     {
@@ -25,6 +37,9 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
 
         lastPosition = transform.position;
         lastRotation = transform.rotation;
+
+        Debug.Log("initTranslation " + initTranslation);
+        Debug.Log("initRotation " + initRotation);
 
         Debug.Log("Adding Rigid Body and Box Collider to hat");
         rb = GetComponent<Rigidbody>();
@@ -71,8 +86,8 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
     {
         if (transform.position != lastPosition || transform.rotation != lastRotation)
         {
-            lastPosition = transform.position;
-            lastRotation = transform.rotation;
+            lastPosition = transform.position + initTranslation;
+            lastRotation = transform.rotation * initRotation;
 
             context.SendJson(new HatMessage
             {
@@ -91,36 +106,65 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
 
             if (avatar != null)
             {
-                AttachHat(avatar);
+                AttachHat(avatar, slot);
             }
         }
     }
 
-    public void AttachHat(Ubiq.Avatars.Avatar avatar)
+    public void AttachHat(Ubiq.Avatars.Avatar avatar, AccessorySlot arg_slot)
     {
-        Debug.Log("Hat attached to " + avatar.name);
-
         FloatingAvatar floatingAvatar = avatar.GetComponentInChildren<FloatingAvatar>();
-        if (floatingAvatar == null || floatingAvatar.head == null)
+        if (floatingAvatar == null) 
         {
             Debug.LogWarning("FloatingAvatar component or head transform not found on avatar");
             return;
         }
-        Transform headTransform = floatingAvatar.head;
 
-        // Remove any previously attached hat using network despawn
-        Transform existingHat = headTransform.Find("NetworkHat"); // TODO: Append UUID of avatar
-        if (existingHat != null)
+        Transform avatarTransform;
+        Transform existingAccessory;
+        switch (arg_slot)
         {
-            Debug.Log("Found an existing hat attached to the avatar\'s head");
-            accessoryManager.headSpawner.Despawn(existingHat.gameObject);
+            case AccessorySlot.Head:
+                avatarTransform = floatingAvatar.head;
+                existingAccessory = avatarTransform.Find("NetworkHead");
+                break;
+            case AccessorySlot.Neck:
+                avatarTransform = floatingAvatar.head;
+                existingAccessory = avatarTransform.Find("NetworkNeck");
+                break;
+            case AccessorySlot.Back:
+                avatarTransform = floatingAvatar.torso;
+                existingAccessory = avatarTransform.Find("NetworkBack");
+                break;
+            case AccessorySlot.Face:
+                avatarTransform = floatingAvatar.head;
+                existingAccessory = avatarTransform.Find("NetworkFace");
+                break;
+            default:
+                return;
         }
 
-        transform.SetParent(headTransform, false);
-        transform.localPosition = Vector3.zero;
-        transform.localRotation = Quaternion.identity;
+        if (avatarTransform == null)
+        {
+            Debug.LogWarning("Transform not found on avatar");
+            return;
+        }
+
+        if (existingAccessory != null)
+        {
+            Debug.Log("Found an existing accessory attached to the avatar");
+            accessoryManager.headSpawner.Despawn(existingAccessory.gameObject);
+        }
+
+        transform.SetParent(avatarTransform, false);
+        transform.position = Vector3.zero;
+        transform.rotation = Quaternion.identity;
+        transform.localPosition = initTranslation;
+        transform.localRotation = initRotation;
 
         DisablePhysics();
+
+        Debug.Log("Hat attached to " + avatar.name);
     }
 
     public void ProcessMessage(ReferenceCountedSceneGraphMessage message)

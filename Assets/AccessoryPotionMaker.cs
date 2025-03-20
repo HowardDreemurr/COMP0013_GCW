@@ -53,9 +53,27 @@ public class AccessoryPotionMaker : MonoBehaviour
         
         if (hat != null)
         {
-            // TODO: Switch on HatNetworkedObject slot enumerator
-            accessories.head = hat.idx;
-            accessoryManager.headSpawner.Despawn(hat.gameObject);
+            switch (hat.slot)
+            {
+                case AccessorySlot.Head:
+                    accessories.head = hat.idx;
+                    accessoryManager.headSpawner.Despawn(hat.gameObject);
+                    break;
+                case AccessorySlot.Neck:
+                    accessories.neck = hat.idx;
+                    accessoryManager.neckSpawner.Despawn(hat.gameObject);
+                    break;
+                case AccessorySlot.Back:
+                    accessories.back = hat.idx;
+                    accessoryManager.backSpawner.Despawn(hat.gameObject);
+                    break;
+                case AccessorySlot.Face:
+                    accessories.face = hat.idx;
+                    accessoryManager.faceSpawner.Despawn(hat.gameObject);
+                    break;
+                default:
+                    return;
+            }
 
             context.SendJson(new Accessories
             {

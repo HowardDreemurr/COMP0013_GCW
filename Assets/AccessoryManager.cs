@@ -10,9 +10,9 @@ public class AccessoryManager : MonoBehaviour
     public RoomClient RoomClient { get; private set; }
 
     public NetworkSpawner headSpawner;
-    public NetworkSpawner neckSpawner; // TODO
-    public NetworkSpawner backSpawner; // TODO
-    public NetworkSpawner faceSpawner; // TODO
+    public NetworkSpawner neckSpawner;
+    public NetworkSpawner backSpawner;
+    public NetworkSpawner faceSpawner;
 
     public PrefabCatalogue headCatalogue;
     public PrefabCatalogue neckCatalogue;
@@ -34,26 +34,55 @@ public class AccessoryManager : MonoBehaviour
         faceSpawner = new NetworkSpawner(networkScene, RoomClient, faceCatalogue, "ubiq.face.");
     }
 
-    public void AttachRandomHat(Ubiq.Avatars.Avatar avatar)
+    public void AttachRandomHat(Ubiq.Avatars.Avatar avatar, AccessorySlot arg_slot)
     {
-        if (headCatalogue.prefabs == null || headCatalogue.prefabs.Count == 0 || avatar == null)
+        PrefabCatalogue catalogue;
+        NetworkSpawner spawner;
+        string name;
+        switch (arg_slot)
+        {
+            case AccessorySlot.Head: 
+                catalogue = headCatalogue;
+                spawner = headSpawner;
+                name = "NetworkHead";
+                break;
+            case AccessorySlot.Neck: 
+                catalogue = neckCatalogue; 
+                spawner = neckSpawner;
+                name = "NetworkNeck";
+                break;
+            case AccessorySlot.Back: 
+                catalogue = backCatalogue; 
+                spawner = backSpawner;
+                name = "NetworkBack";
+                break;
+            case AccessorySlot.Face: 
+                catalogue = faceCatalogue; 
+                spawner = faceSpawner;
+                name = "NetworkFace";
+                break;
+            default:
+                return;
+        }
+
+        if (catalogue.prefabs == null || catalogue.prefabs.Count == 0 || avatar == null)
         {
             return;
         }
 
-        var idx = Random.Range(0, headCatalogue.prefabs.Count);
-        GameObject randomHatPrefab = headCatalogue.prefabs[idx];
+        var idx = Random.Range(0, catalogue.prefabs.Count);
+        GameObject randomHatPrefab = catalogue.prefabs[idx];
 
-        GameObject newHat = headSpawner.SpawnWithPeerScope(randomHatPrefab);
-        newHat.name = "NetworkHat";
+        GameObject newHat = spawner.SpawnWithPeerScope(randomHatPrefab);
+        newHat.name = name;
 
-        HatNetworkedObject newHatNetObj = newHat.GetComponent<HatNetworkedObject>();
-        if (newHatNetObj != null)
+        HatNetworkedObject hatNetworkedObject = newHat.GetComponent<HatNetworkedObject>();
+        if (hatNetworkedObject != null)
         {
-            newHatNetObj.accessoryManager = this;
-            newHatNetObj.collisionsEnabled = false;
-            newHatNetObj.AttachHat(avatar);
-            newHatNetObj.idx = idx;
+            hatNetworkedObject.accessoryManager = this;
+            hatNetworkedObject.collisionsEnabled = false;
+            hatNetworkedObject.AttachHat(avatar, arg_slot);
+            hatNetworkedObject.idx = idx;
         }
         else
         {
@@ -61,23 +90,51 @@ public class AccessoryManager : MonoBehaviour
         }
     }
 
-    public void SpawnRandomHat()
+    public void SpawnRandomHat(AccessorySlot arg_slot)
     {
-        if (headCatalogue.prefabs == null || headCatalogue.prefabs.Count == 0)
+        PrefabCatalogue catalogue;
+        NetworkSpawner spawner;
+        string name;
+        switch (arg_slot)
+        {
+            case AccessorySlot.Head:
+                catalogue = headCatalogue;
+                spawner = headSpawner;
+                name = "NetworkHead";
+                break;
+            case AccessorySlot.Neck:
+                catalogue = neckCatalogue;
+                spawner = neckSpawner;
+                name = "NetworkNeck";
+                break;
+            case AccessorySlot.Back:
+                catalogue = backCatalogue;
+                spawner = backSpawner;
+                name = "NetworkBack";
+                break;
+            case AccessorySlot.Face:
+                catalogue = faceCatalogue;
+                spawner = faceSpawner;
+                name = "NetworkFace";
+                break;
+            default:
+                return;
+        }
+
+        if (catalogue.prefabs == null || catalogue.prefabs.Count == 0)
         {
             Debug.Log("SpawnRandomHat call invalid");
             return;
         }
 
-        var idx = Random.Range(0, headCatalogue.prefabs.Count);
-        GameObject randomHatPrefab = headCatalogue.prefabs[idx];
+        var idx = Random.Range(0, catalogue.prefabs.Count);
+        GameObject accessoryPrefab = catalogue.prefabs[idx];
 
-        GameObject newHat = headSpawner.SpawnWithPeerScope(randomHatPrefab);
-        newHat.transform.localPosition = new Vector3(1, 3, 1);
-        newHat.transform.localRotation = Quaternion.identity;
-        newHat.name = "NetworkHat";
+        GameObject accessory = spawner.SpawnWithPeerScope(accessoryPrefab);
+        accessory.transform.localPosition += new Vector3(1, 3, 1);
+        accessory.name = name;
 
-        HatNetworkedObject hatNetworkedObject = newHat.GetComponent<HatNetworkedObject>();
+        HatNetworkedObject hatNetworkedObject = accessory.GetComponent<HatNetworkedObject>();
         if (hatNetworkedObject != null)
         {
             hatNetworkedObject.accessoryManager = this;
@@ -86,37 +143,65 @@ public class AccessoryManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("HatNetworkedObject component not found on spawned hat.");
+            Debug.LogWarning("HatNetworkedObject component not found on spawned hat");
         }
     }
 
-    public HatNetworkedObject SpawnHat(int idx, bool collisions)
+    public HatNetworkedObject SpawnHat(int idx, bool collisions, AccessorySlot arg_slot)
     {
-        if (idx < 0 || headCatalogue.prefabs == null || idx > (headCatalogue.prefabs.Count-1))
+        PrefabCatalogue catalogue;
+        NetworkSpawner spawner;
+        string name;
+        switch (arg_slot)
         {
-            Debug.Log("SpawnHat call invalid");
+            case AccessorySlot.Head:
+                catalogue = headCatalogue;
+                spawner = headSpawner;
+                name = "NetworkHead";
+                break;
+            case AccessorySlot.Neck:
+                catalogue = neckCatalogue;
+                spawner = neckSpawner;
+                name = "NetworkNeck";
+                break;
+            case AccessorySlot.Back:
+                catalogue = backCatalogue;
+                spawner = backSpawner;
+                name = "NetworkBack";
+                break;
+            case AccessorySlot.Face:
+                catalogue = faceCatalogue;
+                spawner = faceSpawner;
+                name = "NetworkFace";
+                break;
+            default:
+                return null;
+        }
+
+        if (catalogue.prefabs == null || catalogue.prefabs.Count == 0)
+        {
+            Debug.Log("SpawnRandomHat call invalid");
             return null;
         }
 
-        GameObject hatPrefab = headCatalogue.prefabs[idx];
+        GameObject accessoryPrefab = catalogue.prefabs[idx];
 
-        GameObject hat = headSpawner.SpawnWithPeerScope(hatPrefab);
-        hat.transform.localPosition = new Vector3(1, 3, 1);
-        hat.transform.localRotation = Quaternion.identity;
-        hat.name = "NetworkHat";
+        GameObject accessory = spawner.SpawnWithPeerScope(accessoryPrefab);
+        accessory.transform.localPosition += new Vector3(1, 3, 1);
+        accessory.name = name;
 
-        HatNetworkedObject hatNetworkedObject = hat.GetComponent<HatNetworkedObject>();
+        HatNetworkedObject hatNetworkedObject = accessory.GetComponent<HatNetworkedObject>();
         if (hatNetworkedObject != null)
         {
             hatNetworkedObject.accessoryManager = this;
             hatNetworkedObject.collisionsEnabled = collisions;
             hatNetworkedObject.idx = idx;
+            return hatNetworkedObject;
         }
         else
         {
-            Debug.LogWarning("HatNetworkedObject component not found on spawned hat.");
+            Debug.LogWarning("HatNetworkedObject component not found on spawned hat");
+            return null;
         }
-
-        return hatNetworkedObject;
     }
 }

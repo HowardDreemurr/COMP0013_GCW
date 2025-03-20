@@ -139,11 +139,6 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             if (velocity > 0.1)
             {
                 SmashPotion();
-                // Make potion invisible
-                // Freeze its position
-                // Make the box collider expand outwards for a couple of seconds
-                // Set a boolean that switches the behavior inside TriggerEnter s.t. if the Trigger BC intersects an avatar, it puts the accessories on them (use accessoryManager)
-                // After the couple of seconds are up, set a boolean in accessoryCauldronButton (TODO: inject reference on spawn) that makes it delete this potion in Update()
             }
         }
         if (expanding)
@@ -154,13 +149,25 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             if (avatar != null && !affectedAvatars.Contains(avatar.name))
             {
                 Debug.Log("Potion touched avatar " + avatar.name);
-                // TODO: Switch on HatNetworkedObject.slot
-                var hat = accessoryManager.SpawnHat(accessories.head, false);
-                if (hat != null)
+
+                HatNetworkedObject head = accessoryManager.SpawnHat(accessories.head, false, AccessorySlot.Head);
+                HatNetworkedObject back = accessoryManager.SpawnHat(accessories.back, false, AccessorySlot.Back);
+                HatNetworkedObject face = accessoryManager.SpawnHat(accessories.face, false, AccessorySlot.Face);
+
+                if (head != null)
                 {
-                    hat.AttachHat(avatar);
-                    affectedAvatars.Add(avatar.name); // don't apply to this avatar again or else it just freezes the game
+                    head.AttachHat(avatar, AccessorySlot.Head);
                 }
+                if (back != null)
+                {
+                    back.AttachHat(avatar, AccessorySlot.Back);
+                }
+                if (face != null)
+                {
+                    face.AttachHat(avatar, AccessorySlot.Face);
+                }
+
+                affectedAvatars.Add(avatar.name); // don't apply to this avatar again or else it just freezes the game
             }
         }
     }
