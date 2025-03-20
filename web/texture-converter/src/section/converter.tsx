@@ -1,10 +1,14 @@
-import React, { useRef, useState } from "react";
-import { Button, Card } from "@heroui/react";
+import React, { useEffect, useRef, useState } from "react";
+import { Button, Card, Switch } from "@heroui/react";
+
+import maskImg from "../assets/images/texture_mask.png";
 
 const MinecraftSkinMapper: React.FC = () => {
   const [uploadedImageSrc, setUploadedImageSrc] = useState<string | null>(null);
   const [finalTexture, setFinalTexture] = useState<string | null>(null);
+  const [applyMask, setApplyMask] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const triggerFileUpload = () => {
     fileInputRef.current?.click();
@@ -201,21 +205,57 @@ const MinecraftSkinMapper: React.FC = () => {
       });
 
       setFinalTexture(finalCanvas.toDataURL("image/png"));
+
+      if (applyMask) {
+        const finalImage = new Image();
+        finalImage.crossOrigin = "Anonymous";
+        finalImage.src = finalCanvas.toDataURL("image/png");
+        finalImage.onload = () => {
+          const maskImageElement = new Image();
+          maskImageElement.crossOrigin = "Anonymous";
+          maskImageElement.src = maskImg;
+          maskImageElement.onload = () => {
+            const maskedCanvas = document.createElement("canvas");
+            maskedCanvas.width = 1024;
+            maskedCanvas.height = 1024;
+            const mCtx = maskedCanvas.getContext("2d");
+            if (!mCtx) return;
+            mCtx.drawImage(finalImage, 0, 0, 1024, 1024);
+            mCtx.globalCompositeOperation = "destination-in";
+            mCtx.drawImage(maskImageElement, 0, 0, 1024, 1024);
+            setFinalTexture(maskedCanvas.toDataURL("image/png"));
+          };
+        };
+      }
+
+      setTimeout(() => {
+        containerRef.current?.scrollTo({
+          top: containerRef.current.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 0);
     };
   };
 
+  useEffect(() => {
+    generateTexture();
+  }, [applyMask]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-col items-center justify-center p-6">
-      <div className="max-w-3xl w-full text-center mb-12">
-        <h1 className="text-6xl font-extrabold text-white mb-4 tracking-wider">
+    <div
+      ref={containerRef}
+      className="min-h-screen bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-col items-center overflow-auto p-6 absolute w-full h-full"
+    >
+      <div className="max-w-3xl w-full text-center mb-5">
+        <h1 className="text-6xl font-extrabold text-white mb-2 tracking-wider">
           Minecraft Skin Mapper
         </h1>
         <p className="text-xl text-white">
           Transform your Minecraft skin into a custom 1024x1024 avatar texture.
         </p>
       </div>
-      <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
-        <Button onClick={triggerFileUpload} className="w-full mb-2">
+      <div className="bg-white rounded-lg shadow-xl px-8 py-5 w-full max-w-md">
+        <Button onClick={triggerFileUpload} className="w-full">
           Upload Minecraft Skin
         </Button>
         <input
@@ -226,31 +266,40 @@ const MinecraftSkinMapper: React.FC = () => {
           className="hidden"
         />
         {uploadedImageSrc && (
-          <div className="mb-2">
+          <div className="my-2">
             <img
               src={uploadedImageSrc}
               alt="Uploaded Skin"
               className="w-full rounded-md shadow-sm"
+              style={{ imageRendering: "pixelated" }}
             />
           </div>
         )}
         {uploadedImageSrc && (
-          <Button onClick={generateTexture} className="w-full mb-5">
+          <Button onClick={generateTexture} className="w-full mb-2">
             Generate Custom Texture
           </Button>
         )}
         {finalTexture && (
-          <Card className="mt-4">
+          <div className="bg-white rounded-lg shadow-xl px-8 py-5 w-full max-w-md flex flex-col">
             <img
               src={finalTexture}
               alt="Final Texture"
               className="w-full rounded mb-2"
             />
-
+            {finalTexture && (
+              <Switch
+                checked={applyMask}
+                onChange={() => setApplyMask(!applyMask)}
+                className="mb-2"
+              >
+                Ghosted
+              </Switch>
+            )}
             <Button as="a" href={finalTexture} download="custom_texture.png">
               Download Texture
             </Button>
-          </Card>
+          </div>
         )}
       </div>
     </div>

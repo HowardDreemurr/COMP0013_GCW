@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3444175152561107260}
   - component: {fileID: 2075108970}
   - component: {fileID: 4093855498690803947}
-  - component: {fileID: 964017145659305730}
+  - component: {fileID: 3085923671442016620}
   m_Layer: 0
   m_Name: Ubiq Floating Avatar
   m_TagString: Untagged
@@ -76,7 +76,7 @@ MonoBehaviour:
   OnRightGripUpdate:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &964017145659305730
+--- !u!114 &3085923671442016620
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -88,7 +88,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfbaebc4de9b4d72981f451ceb9c8f2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Textures: {fileID: 11400000, guid: 711a32cdfac3cd644a666f4575bf6f22, type: 2}
+  Textures: {fileID: 11400000, guid: 7e291d91d3531462b922f7979f52b7f3, type: 2}
   RandomTextureOnSpawn: 1
   SaveTextureSetting: 1
   OnTextureChanged:
@@ -220,7 +220,15 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 253003865581486029, guid: b0d64f917d2447e4f85037ad6283d5bf, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 253003865581486029, guid: b0d64f917d2447e4f85037ad6283d5bf, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 14e14cb5b097b417ca59ffdd2220f2a2, type: 2}
+    - target: {fileID: 253003865581486029, guid: b0d64f917d2447e4f85037ad6283d5bf, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
       value: 
       objectReference: {fileID: 2100000, guid: 14e14cb5b097b417ca59ffdd2220f2a2, type: 2}
     - target: {fileID: 1425940620351308962, guid: b0d64f917d2447e4f85037ad6283d5bf, type: 3}
