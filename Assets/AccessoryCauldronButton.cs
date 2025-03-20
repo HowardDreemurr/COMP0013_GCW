@@ -1,7 +1,10 @@
+using System.Collections.Generic;
+using NUnit.Framework;
 using Ubiq.Avatars;
 using Ubiq.Messaging;
 using Ubiq.Rooms;
 using Ubiq.Spawning;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
@@ -17,6 +20,8 @@ public class AccessoryCauldronButton : MonoBehaviour
     [SerializeField] private AccessoryManager accessoryManager;
     [SerializeField] private AccessoryPotionMaker accessoryPotionMaker;
     private XRSimpleInteractable interactable;
+
+    private List<AccessoryPotion> potions = new List<AccessoryPotion>();
 
     private void Awake()
     {
@@ -46,7 +51,25 @@ public class AccessoryCauldronButton : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        List<AccessoryPotion> toRemove = new List<AccessoryPotion>();
         
+        // Mark destoryed potions for deletion via toRemove and notify networkSpawner
+        foreach (AccessoryPotion accessoryPotion in potions)
+        {
+            if (accessoryPotion.destroyed)
+            {
+                // Despawn the GameObject
+                potionSpawner.Despawn(accessoryPotion.gameObject);
+                // Mark for removal from list
+                toRemove.Add(accessoryPotion);
+            }
+        }
+
+        // Remove from the source list (removing from the list we are iterating over would be UB)
+        foreach (var potion in toRemove)
+        {
+            potions.Remove(potion);
+        }
     }
 
     private void OnDestroy()
@@ -81,6 +104,8 @@ public class AccessoryCauldronButton : MonoBehaviour
             accessoryPotion.accessories.neck = accessoryPotionMaker.accessories.neck;
             accessoryPotion.accessories.back = accessoryPotionMaker.accessories.back;
             accessoryPotion.accessories.face = accessoryPotionMaker.accessories.face;
+
+            potions.Add(accessoryPotion);
         }
         else
         {

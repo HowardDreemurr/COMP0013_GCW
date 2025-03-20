@@ -13,6 +13,13 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
     public BoxCollider triggerCollider; // Implements 'splash' logic
     public BoxCollider boxCollider; // Implements actual collisions
 
+    public float expansionDuration = 5f;
+    public float expansionSize = 10f;
+    private float timer = 0f;
+    private bool expanding = false;
+    public bool destroyed = false;
+    private Vector3 initialSize;
+
     public AccessoryManager accessoryManager; // Injected by design-time button that holds reference to accessoryManager
 
     private NetworkContext context;
@@ -77,7 +84,17 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
     // Update is called once per frame
     void Update()
     {
-        
+        if (expanding)
+        {
+            timer += Time.deltaTime;
+            // Stop expanding after duration is reached
+            if (timer >= expansionDuration)
+            {
+                Debug.Log("Potion stopped expanding");
+                expanding = false;
+                destroyed = true;
+            }
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -86,18 +103,68 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
         {
             float velocity = rigidBody.linearVelocity.magnitude;
 
-            Debug.Log("Potion collided with velocity" + velocity);
+            Debug.Log("Potion collided with velocity " + velocity);
             Debug.Log("Head: " + accessories.head + " Neck :" + accessories.neck + " Face: " + accessories.face + " Back: " + accessories.back);
 
             if (velocity > 0.1)
             {
-                Debug.Log("Potion was smashed");
+                SmashPotion();
                 // Make potion invisible
                 // Freeze its position
                 // Make the box collider expand outwards for a couple of seconds
                 // Set a boolean that switches the behavior inside TriggerEnter s.t. if the Trigger BC intersects an avatar, it puts the accessories on them (use accessoryManager)
                 // After the couple of seconds are up, set a boolean in accessoryCauldronButton (TODO: inject reference on spawn) that makes it delete this potion in Update()
             }
+        }
+        if (expanding)
+        {
+            Ubiq.Avatars.Avatar avatar = other.GetComponentInParent<Ubiq.Avatars.Avatar>();
+
+            if (avatar != null)
+            {
+                Debug.Log("Potion touched avatar " + avatar.name);
+            }
+        }
+    }
+
+    private void SmashPotion()
+    {
+        Debug.Log("Potion was smashed");
+
+        if (rigidBody != null)
+        {
+            rigidBody.isKinematic = true;
+        }
+        MeshRenderer renderer = GetComponent<MeshRenderer>();
+        if (renderer != null)
+        {
+            // renderer.enabled = false;
+        }
+        if (triggerCollider != null)
+        {
+            initialSize = triggerCollider.size;
+            expanding = true; // Start expansion
+        }
+        var grab = GetComponent<XRGrabInteractable>();
+        if (grab != null)
+        {
+            grab.enabled = false;
+            Destroy(grab);
+        }
+
+        boxCollider.enabled = false;
+        collisionsEnabled = false;
+
+        triggerCollider.size = initialSize * expansionSize;
+    }
+
+    void OnDrawGizmos()
+    {
+        if (triggerCollider != null)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.matrix = transform.localToWorldMatrix;
+            Gizmos.DrawWireCube(triggerCollider.center, triggerCollider.size);
         }
     }
 
