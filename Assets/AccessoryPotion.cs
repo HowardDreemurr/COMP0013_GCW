@@ -92,6 +92,11 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             if (velocity > 0.1)
             {
                 Debug.Log("Potion was smashed");
+                // Make potion invisible
+                // Freeze its position
+                // Make the box collider expand outwards for a couple of seconds
+                // Set a boolean that switches the behavior inside TriggerEnter s.t. if the Trigger BC intersects an avatar, it puts the accessories on them (use accessoryManager)
+                // After the couple of seconds are up, set a boolean in accessoryCauldronButton (TODO: inject reference on spawn) that makes it delete this potion in Update()
             }
         }
     }
