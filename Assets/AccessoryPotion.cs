@@ -19,7 +19,6 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
     public float expansionSize = 10f;
     private float timer = 0f;
 
-
     private bool smashed = false;
     private bool expanding = false;
     public bool destroyed = false;
@@ -33,6 +32,9 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
     private NetworkContext context;
     private Vector3 lastPosition;
     private Quaternion lastRotation;
+
+    private bool owner = false;
+    private bool isOwnedBySomeoneElse = false;
 
     public struct Accessories
     {
@@ -83,18 +85,33 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
         }
         grab.selectEntered.AddListener((SelectEnterEventArgs args) =>
         {
-            Debug.Log("Potion was selected!");
+            // TODO: Check that this is only called on the client which grabs the potion and not on all clients when someone in the room grabs the potion
+            owner = true;
+            context.SendJson(new TransformMessage
+            {
+                position = transform.position,
+                rotation = transform.rotation,
+                smashed = smashed,
+                isOwnedBySomeoneElse = true
+            });
         });
         grab.selectExited.AddListener((SelectExitEventArgs args) =>
         {
-            Debug.Log("Potion was dropped!");
+            owner = false;
+            context.SendJson(new TransformMessage
+            {
+                position = transform.position,
+                rotation = transform.rotation,
+                smashed = smashed,
+                isOwnedBySomeoneElse = false
+            });
         });
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (destroyed) return;
+        if (destroyed) return; // We're waiting for the NetworkSpawner to despawn this object
 
         if (transform.position != lastPosition || transform.rotation != lastRotation)
         {
@@ -105,7 +122,8 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             {
                 position = transform.position,
                 rotation = transform.rotation,
-                smashed = false
+                smashed = smashed,
+                isOwnedBySomeoneElse = isOwnedBySomeoneElse & owner
             });
         }
 
@@ -202,12 +220,7 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
 
         triggerCollider.size = initialSize * expansionSize;
 
-        context.SendJson(new TransformMessage
-        {
-            position = transform.position,
-            rotation = transform.rotation,
-            smashed = true
-        });
+        // NOTE: If this does not synchronize potion smashing well, put back the message here
     }
 
     void OnDrawGizmos()
@@ -225,11 +238,28 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
         public Vector3 position;
         public Quaternion rotation;
         public bool smashed;
+        public bool isOwnedBySomeoneElse;
     }
 
     public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
     {
         var msg = message.FromJson<TransformMessage>();
+
+        if (!owner && msg.isOwnedBySomeoneElse)
+        {
+            // Someone picked up the potion (not us)
+            isOwnedBySomeoneElse = true;
+            rigidBody.useGravity = false;
+            rigidBody.isKinematic = true;
+        }
+        else if (isOwnedBySomeoneElse && !msg.isOwnedBySomeoneElse)
+        {
+            // Someone dropped the potion (not us)
+            isOwnedBySomeoneElse = false;
+            rigidBody.useGravity = true;
+            rigidBody.isKinematic = false;
+        }
+
         transform.position = msg.position;
         transform.rotation = msg.rotation;
 
