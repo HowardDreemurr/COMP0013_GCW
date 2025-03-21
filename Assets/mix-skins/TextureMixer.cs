@@ -125,8 +125,6 @@ public class TextureMixer : MonoBehaviour
 
         // Update 
         this.currentTexture.SetPixels(basePixels);
-        this.currentTexture.Apply();
-
     }
 
 
