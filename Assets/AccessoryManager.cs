@@ -4,6 +4,7 @@ using Ubiq.Avatars;
 using Ubiq.Messaging;
 using Ubiq.Rooms;
 using Ubiq.Spawning;
+using System.Collections;
 
 public class AccessoryManager : MonoBehaviour
 {
@@ -76,7 +77,14 @@ public class AccessoryManager : MonoBehaviour
         GameObject newHat = spawner.SpawnWithPeerScope(randomHatPrefab);
         newHat.name = name;
 
-        HatNetworkedObject hatNetworkedObject = newHat.GetComponent<HatNetworkedObject>();
+        StartCoroutine(attachHatExternal(newHat, avatar, arg_slot, idx));
+    }
+
+    private IEnumerator attachHatExternal(GameObject hat, Ubiq.Avatars.Avatar avatar, AccessorySlot arg_slot, int idx)
+    {
+        yield return new WaitForSeconds(0.2f); // Ubiq does not give me a way of telling if the hat has spawned for other users, it seems?
+
+        HatNetworkedObject hatNetworkedObject = hat.GetComponent<HatNetworkedObject>();
         if (hatNetworkedObject != null)
         {
             hatNetworkedObject.accessoryManager = this;

@@ -1,8 +1,11 @@
 using UnityEngine;
+using System.Collections;
 using Ubiq.Spawning;
 using Ubiq.Messaging;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.Windows;
+using static Ubiq.Avatars.AvatarInput;
 
 // NB: This is called 'HatNetworkedObject' as a holdover, it can be thrown onto any accessory, not just hats
 public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
@@ -24,50 +27,45 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
     private Vector3 initTranslation;
     private Quaternion initRotation;
 
+    private bool physicsOwner;
+    private bool isParented;
+
+    private enum CollisionState
+    {
+        Unset,
+        Enabled,
+        Disabled
+    }
+
     void Awake()
     {
         // Store the initial transform values when the GameObject is first instantiated
         initTranslation = transform.position;
         initRotation = transform.rotation;
-    }
 
-    private void Start()
-    {
-        context = NetworkScene.Register(this);
-
-        lastPosition = transform.position;
-        lastRotation = transform.rotation;
-
-        Debug.Log("initTranslation " + initTranslation);
-        Debug.Log("initRotation " + initRotation);
-
-        Debug.Log("Adding Rigid Body and Box Collider to hat");
+        // Add or retrieve the Rigidbody
         rb = GetComponent<Rigidbody>();
-        bc = GetComponent<BoxCollider>();
-
         if (rb == null)
         {
             rb = gameObject.AddComponent<Rigidbody>();
             rb.useGravity = true;
             rb.isKinematic = false;
         }
+
+        // Add or retrieve the main BoxCollider
+        bc = GetComponent<BoxCollider>();
         if (bc == null)
         {
             bc = gameObject.AddComponent<BoxCollider>();
         }
 
-        // Create a separate trigger collider for putting the hat on players
+        // Create a separate trigger collider
         triggerCollider = gameObject.AddComponent<BoxCollider>();
         triggerCollider.isTrigger = true;
         triggerCollider.size *= 1.2f;
 
-        if (!collisionsEnabled)
-        {
-            DisablePhysics();
-        }
-
         // Grabbing
-        var grab = gameObject.GetComponent<XRGrabInteractable>();
+        XRGrabInteractable grab = gameObject.GetComponent<XRGrabInteractable>();
         if (!grab)
         {
             grab = gameObject.AddComponent<XRGrabInteractable>();
@@ -75,31 +73,70 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
         grab.selectEntered.AddListener((SelectEnterEventArgs args) =>
         {
             Debug.Log("Hat was selected!");
+            DisablePhysics(null);
+            physicsOwner = true;
         });
         grab.selectExited.AddListener((SelectExitEventArgs args) =>
         {
             Debug.Log("Hat was dropped!");
+            EnablePhysics();
+            physicsOwner = false;
         });
+
+        // Disable physics locally
+        if (rb != null)
+        {
+            rb.isKinematic = true;
+            rb.detectCollisions = false;
+        }
+    }
+
+    private void Start()
+    {
+        // Register with the network scene
+        context = NetworkScene.Register(this);
+
+        // If collisionsEnabled is true on my client, it must've been explicitly set after construction
+        // Let's tell everyone else, since they spawned the hat through a different code path (NetworkSpawner) that won't mirror this
+        if (collisionsEnabled)
+        {
+            EnablePhysics();
+            physicsOwner = true;
+        }
+
+        // Initialize our last known position and rotation
+        lastPosition = transform.position;
+        lastRotation = transform.rotation;
+
+        Debug.Log("initTranslation " + initTranslation);
+        Debug.Log("initRotation " + initRotation);
     }
 
     private void Update()
     {
-        if (transform.position != lastPosition || transform.rotation != lastRotation)
+        if ((transform.position != lastPosition || transform.rotation != lastRotation))
         {
             lastPosition = transform.position + initTranslation;
             lastRotation = transform.rotation * initRotation;
 
-            context.SendJson(new HatMessage
+            if (physicsOwner)
             {
-                position = transform.position,       // world position
-                rotation = transform.rotation        // world rotation
-            });
+                context.SendJson(new HatMessage
+                {
+                    position = transform.position,
+                    rotation = transform.rotation,
+                    collisions = CollisionState.Unset,
+                    parentNameOrId = ""
+                });
+            }
         }
     }
 
     // TODO: I should put an enumerator on this class specifying slot (hat, back, etc.) and switch behaviour here appropriately
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log("HatNetworkedObject.OnTriggerEnter(Collider other) was called");
+
         if (collisionsEnabled)
         {
             Ubiq.Avatars.Avatar avatar = other.GetComponentInParent<Ubiq.Avatars.Avatar>();
@@ -114,7 +151,7 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
     public void AttachHat(Ubiq.Avatars.Avatar avatar, AccessorySlot arg_slot)
     {
         FloatingAvatar floatingAvatar = avatar.GetComponentInChildren<FloatingAvatar>();
-        if (floatingAvatar == null) 
+        if (floatingAvatar == null)
         {
             Debug.LogWarning("FloatingAvatar component or head transform not found on avatar");
             return;
@@ -150,19 +187,51 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
             return;
         }
 
-        if (existingAccessory != null)
+        // Retrieve the singleton AccessoryManager (idk if it's actually a singleton but it's design-time and there's only one)
+        AccessoryManager localAccessoryManager = FindFirstObjectByType<AccessoryManager>();
+        if (localAccessoryManager == null)
         {
-            Debug.Log("Found an existing accessory attached to the avatar");
-            accessoryManager.headSpawner.Despawn(existingAccessory.gameObject);
+            Debug.LogWarning("Local AccessoryManager not found in the scene");
+            return;
         }
 
+        // Choose the correct spawner based on the accessory slot
+        NetworkSpawner spawner = null;
+        switch (arg_slot)
+        {
+            case AccessorySlot.Head:
+                spawner = localAccessoryManager.headSpawner;
+                break;
+            case AccessorySlot.Neck:
+                spawner = localAccessoryManager.neckSpawner;
+                break;
+            case AccessorySlot.Back:
+                spawner = localAccessoryManager.backSpawner;
+                break;
+            case AccessorySlot.Face:
+                spawner = localAccessoryManager.faceSpawner;
+                break;
+        }
+
+        // If an existing accessory is found (and it isn't this hat itself), despawn it
+        if (existingAccessory != null && existingAccessory != transform && spawner != null)
+        {
+            Debug.Log("Found an existing accessory attached to the avatar");
+            spawner.Despawn(existingAccessory.gameObject);
+        }
+
+        // Parent this hat to the avatar's transform and reset its transform values to the axis conversion ones
         transform.SetParent(avatarTransform, false);
         transform.position = Vector3.zero;
         transform.rotation = Quaternion.identity;
         transform.localPosition = initTranslation;
         transform.localRotation = initRotation;
 
-        DisablePhysics();
+        // Extract UUID from avatar name
+        string[] parts = avatar.name.Split(' ');
+        string parentAvatarId = parts[parts.Length - 1];
+        DisablePhysics(parentAvatarId);
+        isParented = true;
 
         Debug.Log("Hat attached to " + avatar.name);
     }
@@ -170,25 +239,106 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
     public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
     {
         var msg = message.FromJson<HatMessage>();
-        transform.position = msg.position;
-        transform.rotation = msg.rotation;
 
-        lastPosition = transform.position;
-        lastRotation = transform.rotation;
+        if (!physicsOwner)
+        {
+            transform.position = msg.position;
+            transform.rotation = msg.rotation;
+            lastPosition = transform.position;
+            lastRotation = transform.rotation;
+        }
+
+        if (msg.collisions == CollisionState.Enabled && !collisionsEnabled)
+        {
+            EnablePhysics();
+            physicsOwner = false;
+        }
+        else if (msg.collisions == CollisionState.Disabled && collisionsEnabled)
+        {
+            DisablePhysics(null);
+            physicsOwner = false;
+        }
+
+        Debug.Log("Received message with parent = " + msg.parentNameOrId);
+
+        if (!string.IsNullOrEmpty(msg.parentNameOrId) && !isParented)
+        {
+            // NOTE: To unparent the hat, I guess you could send a non-null transform which is just the root of the scene?
+            GameObject parentObj = GameObject.Find("Remote Avatar " + msg.parentNameOrId);
+            if (parentObj == null)
+            {
+                // Try the same UUID but with "My Avatar #<UUID>", since it could be us
+                parentObj = GameObject.Find("My Avatar " + msg.parentNameOrId);
+            }
+
+            if (parentObj != null)
+            {
+                Debug.Log("Attempting to parent Hat to " + parentObj.name);
+
+                Ubiq.Avatars.Avatar parentAvatar = parentObj.GetComponentInChildren<Ubiq.Avatars.Avatar>();
+
+                if (parentAvatar != null)
+                {
+                    AttachHat(parentAvatar, slot);
+                }
+                else
+                {
+                    Debug.Log("Found GameObject but could not find child Avatar component");
+                }
+            }
+            else
+            {
+                Debug.Log("Could not find parent with UUID: " + msg.parentNameOrId);
+            }
+            
+        }
     }
 
-    public void DisablePhysics()
+    public void DisablePhysics(string parentAvatarId)
     {
+        Debug.Log("Disabling Physics (parent = " + parentAvatarId + ")");
+
+        collisionsEnabled = false;
         if (rb != null)
         {
             rb.isKinematic = true;
             rb.detectCollisions = false;
         }
+
+        context.SendJson(new HatMessage
+        {
+            position = transform.position,
+            rotation = transform.rotation,
+            collisions = CollisionState.Disabled,
+            parentNameOrId = parentAvatarId
+        });
+    }
+
+    public void EnablePhysics()
+    {
+        Debug.Log("Enabling Physics");
+
+        collisionsEnabled = true;
+        if (rb != null)
+        {
+            rb.isKinematic = false;
+            rb.detectCollisions = true;
+        }
+
+        context.SendJson(new HatMessage
+        {
+            position = transform.position,
+            rotation = transform.rotation,
+            collisions = CollisionState.Enabled,
+            parentNameOrId = ""
+        });
     }
 
     private struct HatMessage
     {
-        public Vector3 position;    // global position
-        public Quaternion rotation; // global rotation
+        public Vector3 position;
+        public Quaternion rotation;
+        public CollisionState collisions;
+        public string parentNameOrId;
     }
 }
