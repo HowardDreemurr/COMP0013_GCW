@@ -77,7 +77,7 @@ public class TextureMixer : MonoBehaviour
         }
         else
         {
-            ApplyMaskToTexture(GetMask(this.operationNumber % this.NumberOfMask), texture);
+            this.currentTexture = ApplyMaskToTexture(this.currentTexture, GetMask(this.operationNumber % this.NumberOfMask), texture);
         }
 
         this.operationNumber += 1;
@@ -93,24 +93,24 @@ public class TextureMixer : MonoBehaviour
         return textureMask[index];
     }
 
-    public void ApplyMaskToTexture(Texture2D mask, Texture2D ingredient)
+    public Texture2D ApplyMaskToTexture(Texture2D basedTexture, Texture2D mask, Texture2D ingredient)
     {
-        if (this.currentTexture == null || mask == null || ingredient == null)
+        if (basedTexture == null || mask == null || ingredient == null)
         {
             Debug.LogWarning("[TextureMixer](ApplyMaskToTexture) Empty Texture or Mask!");
-            return;
+            return null;
         }
 
         // Ensure same size of the texture
-        if (this.currentTexture.width != mask.width || this.currentTexture.height != mask.height ||
-            this.currentTexture.width != ingredient.width || this.currentTexture.height != ingredient.height)
+        if (basedTexture.width != mask.width || basedTexture.height != mask.height ||
+            basedTexture.width != ingredient.width || basedTexture.height != ingredient.height)
         {
             Debug.LogWarning("[TextureMixer](ApplyMaskToTexture) In-Matched Texture or Mask Size!");
-            return;
+            return null;
         }
 
         // Fetch all pixels
-        Color[] basePixels = this.currentTexture.GetPixels();
+        Color[] basePixels = basedTexture.GetPixels();
         Color[] maskPixels = mask.GetPixels();
         Color[] ingredientPixels = ingredient.GetPixels();
 
@@ -124,7 +124,9 @@ public class TextureMixer : MonoBehaviour
         }
 
         // Update 
-        this.currentTexture.SetPixels(basePixels);
+        Texture2D resultTexture = new Texture2D(basedTexture.width, basedTexture.height, basedTexture.format, false);
+        resultTexture.SetPixels(basePixels);
+        return resultTexture;
     }
 
 
