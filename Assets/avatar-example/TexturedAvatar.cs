@@ -1,4 +1,5 @@
 ﻿using System;
+using Ubiq.Spawning;
 using Ubiq.Avatars;
 using UnityEngine.Events;
 using UnityEngine;
@@ -16,12 +17,15 @@ public class TexturedAvatar : MonoBehaviour
     public AvatarTextureCatalogue Textures;
     public bool RandomTextureOnSpawn;
     public bool SaveTextureSetting;
+    public GameObject CatalogueChangeParticles;
+    public GameObject CustomChangeParticles;
 
     [Serializable]
     public class TextureEvent : UnityEvent<Texture2D> { }
     public TextureEvent OnTextureChanged;
 
     private Avatar avatar;
+    private FloatingAvatar floatingAvatar;
     private string uuid;
     private string blob;
     private RoomClient roomClient;
@@ -33,6 +37,7 @@ public class TexturedAvatar : MonoBehaviour
         roomClient = NetworkScene.Find(this).GetComponentInChildren<RoomClient>();
 
         avatar = GetComponent<Avatar>();
+        floatingAvatar = avatar.GetComponentInChildren<FloatingAvatar>();
 
         if (avatar.IsLocal)
         {
@@ -107,6 +112,7 @@ public class TexturedAvatar : MonoBehaviour
             if (avatar.IsLocal)
             {
                 roomClient.Me["ubiq.avatar.texture.blob"] = blob;
+                SpawnChangeParticles(CustomChangeParticles);
             }
 
             if (avatar.IsLocal && SaveTextureSetting)
@@ -148,6 +154,8 @@ public class TexturedAvatar : MonoBehaviour
             {
                 roomClient.Me["ubiq.avatar.texture.blob"] = null;
                 roomClient.Me["ubiq.avatar.texture.uuid"] = this.uuid;
+
+                SpawnChangeParticles(CatalogueChangeParticles);
             }
 
             if (avatar.IsLocal && SaveTextureSetting)
@@ -203,5 +211,16 @@ public class TexturedAvatar : MonoBehaviour
         string base64 = Convert.ToBase64String(pngData);
         return base64;
     }
+
+    private void SpawnChangeParticles(GameObject particlePrefab)
+    {
+        if (particlePrefab)
+        {
+            var instance = NetworkSpawnManager.Find(this).SpawnWithPeerScope(particlePrefab);
+
+            instance.transform.position = floatingAvatar.torso.position;
+        }
+    }
+
 }
 

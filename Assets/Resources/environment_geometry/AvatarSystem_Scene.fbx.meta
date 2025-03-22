@@ -3,7 +3,82 @@ guid: 52b2cf3d978b24301bca0a9197702280
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Fire
+    second: {fileID: 2100000, guid: 0446ea8b1446d7346ae9c9e614751176, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Ground
+    second: {fileID: 2100000, guid: 0bf665d48f5dbfe4ca15896cf53bb412, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Leafs.002
+    second: {fileID: 2100000, guid: 74ffe58f66e36ce45a284b043172a365, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Leafs.010
+    second: {fileID: 2100000, guid: f6c904bd717695f4d8643b856e7d8f28, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Leafs.011
+    second: {fileID: 2100000, guid: 22662c6f1882a8d439efeadcb0632d10, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Leafs.012
+    second: {fileID: 2100000, guid: 8762ada88a0f69d41a97896c7d9dceb9, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Leafs.013
+    second: {fileID: 2100000, guid: 2fa62946cb4139645bd1bf7a173e9ab8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Leafs.014
+    second: {fileID: 2100000, guid: 43fa3d3ee187ff748b4b6b7e02e61f4b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Leafs.015
+    second: {fileID: 2100000, guid: 878dd6b9dedbee64eb06efd428aa679c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Leafs.016
+    second: {fileID: 2100000, guid: 15fc63a6d3295b1418d4cf968530f3f7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material_2
+    second: {fileID: 2100000, guid: 270f784e1299bdc4ea32cdea1674df63, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material_2.001
+    second: {fileID: 2100000, guid: c4e524f0c5b43b946853301b8ee4c9ad, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Wood
+    second: {fileID: 2100000, guid: 545e99eeec116f948819615b3a2b7f2d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: paper
+    second: {fileID: 2100000, guid: 00a9a6faaba221a4bb3194ce74f9dbd6, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: potion_green
+    second: {fileID: 2100000, guid: a5d08b025048b0848b3b6c734ec25936, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

@@ -91,6 +91,8 @@ MonoBehaviour:
   Textures: {fileID: 11400000, guid: 7e291d91d3531462b922f7979f52b7f3, type: 2}
   RandomTextureOnSpawn: 1
   SaveTextureSetting: 1
+  CatalogueChangeParticles: {fileID: 8041105477772115659, guid: d3ccd44c78b549343b919e20ce751336, type: 3}
+  CustomChangeParticles: {fileID: 8041105477772115659, guid: d3ccd44c78b549343b919e20ce751336, type: 3}
   OnTextureChanged:
     m_PersistentCalls:
       m_Calls: []
