@@ -134,7 +134,11 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
                     position = transform.position,
                     rotation = transform.rotation,
                     smashed = smashed,
-                    collisions = CollisionState.Unset
+                    collisions = CollisionState.Unset,
+                    headIdx = -2,
+                    neckIdx = -2,
+                    backIdx = -2,
+                    faceIdx = -2
                 });
             }
         }
@@ -235,7 +239,11 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             position = transform.position,
             rotation = transform.rotation,
             smashed = true,
-            collisions = CollisionState.Disabled
+            collisions = CollisionState.Disabled,
+            headIdx = -2,
+            neckIdx = -2,
+            backIdx = -2,
+            faceIdx = -2
         });
     }
 
@@ -255,6 +263,10 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
         public Quaternion rotation;
         public bool smashed;
         public CollisionState collisions;
+        public int headIdx; // -2 => no change, -1 => no accessory, >=0 => accessory idx
+        public int neckIdx;
+        public int backIdx;
+        public int faceIdx;
     }
 
     public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
@@ -284,6 +296,23 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             // If !msg.smashed, just keep it as is; we want to hold true until we finish calling SmashPotion locally
             smashed = true;
         }
+
+        if (msg.headIdx != -2)
+        {
+            accessories.head = msg.headIdx;
+        }
+        if (msg.neckIdx != -2)
+        {
+            accessories.neck = msg.neckIdx;
+        }
+        if (msg.backIdx != -2)
+        {
+            accessories.back = msg.backIdx;
+        }
+        if (msg.faceIdx != -2)
+        {
+            accessories.face = msg.faceIdx;
+        }
     }
 
     public void DisablePhysics()
@@ -303,7 +332,11 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             position = transform.position,
             rotation = transform.rotation,
             smashed = smashed,
-            collisions = CollisionState.Disabled
+            collisions = CollisionState.Disabled,
+            headIdx = -2,
+            neckIdx = -2,
+            backIdx = -2,
+            faceIdx = -2
         });
     }
 
@@ -324,7 +357,28 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             position = transform.position,
             rotation = transform.rotation,
             smashed = smashed,
-            collisions = CollisionState.Enabled
+            collisions = CollisionState.Enabled,
+            headIdx = -2,
+            neckIdx = -2,
+            backIdx = -2,
+            faceIdx = -2
+        });
+    }
+
+    public void syncState()
+    {
+        // Only the guy who pressed the button will be calling this function
+        // It's called 200ms after spawning on his end to (hopefully) prevent the message being lost due to NetworkSpawner latency
+        context.SendJson(new TransformMessage
+        {
+            position = transform.position,
+            rotation = transform.rotation,
+            smashed = smashed,
+            collisions = CollisionState.Unset,
+            headIdx = accessories.head,
+            neckIdx = accessories.neck,
+            backIdx = accessories.back,
+            faceIdx = accessories.face
         });
     }
 }

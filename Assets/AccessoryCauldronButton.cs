@@ -8,6 +8,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
+using System.Collections;
 
 public class AccessoryCauldronButton : MonoBehaviour
 {
@@ -33,11 +34,11 @@ public class AccessoryCauldronButton : MonoBehaviour
     {
         if (accessoryPotionMaker == null)
         {
-            Debug.LogWarning("AccessoryPotionMaker reference not set in inspector! (AccessorryCauldronButton)");
+            Debug.LogWarning("AccessoryPotionMaker reference not set in inspector! (AccessoryCauldronButton)");
         }
         if (accessoryManager == null)
         {
-            Debug.LogWarning("AccessoryManager reference not set in inspector! (AccessorryCauldronButton)");
+            Debug.LogWarning("AccessoryManager reference not set in inspector! (AccessoryCauldronButton)");
         }
 
         interactable = GetComponent<XRSimpleInteractable>();
@@ -89,22 +90,25 @@ public class AccessoryCauldronButton : MonoBehaviour
 
         GameObject potionPrefab = potionCatalogue.prefabs[0];
         GameObject potion = potionSpawner.SpawnWithPeerScope(potionPrefab);
-        potion.transform.localPosition = accessoryPotionMaker.transform.localPosition + new Vector3(0, 2, 0); // TODO: Put above cube
+        potion.transform.localPosition = accessoryPotionMaker.transform.localPosition + new Vector3(0, 2, 0);
         potion.transform.localRotation = Quaternion.identity;
 
         AccessoryPotion accessoryPotion = potion.GetComponent<AccessoryPotion>();
         if (accessoryPotion != null)
         {
-            // Possible race condition
             accessoryPotion.accessories.head = accessoryPotionMaker.accessories.head;
             accessoryPotion.accessories.neck = accessoryPotionMaker.accessories.neck;
             accessoryPotion.accessories.back = accessoryPotionMaker.accessories.back;
             accessoryPotion.accessories.face = accessoryPotionMaker.accessories.face;
             potions.Add(accessoryPotion);
+            StartCoroutine(syncPotionState(accessoryPotion));
         }
-        else
-        {
-            Debug.LogWarning("accessoryPotion component not found on spawned potion.");
-        }
+    }
+
+    private IEnumerator syncPotionState(AccessoryPotion potion)
+    {
+        yield return new WaitForSeconds(0.2f);
+
+        potion.syncState();
     }
 }
