@@ -42,6 +42,22 @@ public class TextureMixer : MonoBehaviour
         
     }
 
+
+    public string AddIngradient(int operationNumer, Texture2D ingredient, string oldblob)
+    {
+        Texture2D mixedTexture;
+        if (oldblob == null)
+        {
+            mixedTexture = ingredient;
+        }
+        else
+        {
+            mixedTexture = ApplyMaskToTexture(Base64ToTexture2D(oldblob), GetMask(operationNumer % this.NumberOfMask), ingredient);
+        }
+
+        return Texture2DToBase64(mixedTexture);
+    }
+
     public void AddIngradient(string base64)
     {
         AddIngredient(Base64ToTexture2D(base64));
