@@ -183,7 +183,7 @@ public class AccessoryManager : MonoBehaviour
         GameObject accessoryPrefab = catalogue.prefabs[idx];
 
         GameObject accessory = spawner.SpawnWithPeerScope(accessoryPrefab);
-        accessory.transform.localPosition += new Vector3(1, 3, 1);
+        accessory.transform.localPosition += new Vector3(0, 3, 4);
         accessory.name = name;
 
         HatNetworkedObject hatNetworkedObject = accessory.GetComponent<HatNetworkedObject>();
@@ -239,7 +239,7 @@ public class AccessoryManager : MonoBehaviour
         GameObject accessoryPrefab = catalogue.prefabs[idx];
 
         GameObject accessory = spawner.SpawnWithPeerScope(accessoryPrefab);
-        accessory.transform.localPosition += new Vector3(1, 3, 1);
+        accessory.transform.localPosition += new Vector3(0, 3, 4);
         accessory.name = name;
 
         HatNetworkedObject hatNetworkedObject = accessory.GetComponent<HatNetworkedObject>();
