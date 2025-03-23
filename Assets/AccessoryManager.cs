@@ -4,14 +4,21 @@ using Ubiq.Avatars;
 using Ubiq.Messaging;
 using Ubiq.Rooms;
 using Ubiq.Spawning;
+using System.Collections;
 
 public class AccessoryManager : MonoBehaviour
 {
     public RoomClient RoomClient { get; private set; }
-    private AvatarManager avatarManager;
-    private NetworkSpawner spawner;
 
-    public PrefabCatalogue accessoryCatalogue;
+    public NetworkSpawner headSpawner;
+    public NetworkSpawner neckSpawner;
+    public NetworkSpawner backSpawner;
+    public NetworkSpawner faceSpawner;
+
+    public PrefabCatalogue headCatalogue;
+    public PrefabCatalogue neckCatalogue;
+    public PrefabCatalogue backCatalogue;
+    public PrefabCatalogue faceCatalogue;
 
     private void Awake()
     {
@@ -21,61 +28,232 @@ public class AccessoryManager : MonoBehaviour
     private void Start()
     {
         var networkScene = NetworkScene.Find(this);
-        spawner = new NetworkSpawner(networkScene, RoomClient, accessoryCatalogue, "ubiq.accessory.");
-        avatarManager = networkScene.GetComponentInChildren<AvatarManager>();
+
+        headSpawner = new NetworkSpawner(networkScene, RoomClient, headCatalogue, "ubiq.head.");
+        neckSpawner = new NetworkSpawner(networkScene, RoomClient, neckCatalogue, "ubiq.neck.");
+        backSpawner = new NetworkSpawner(networkScene, RoomClient, backCatalogue, "ubiq.back.");
+        faceSpawner = new NetworkSpawner(networkScene, RoomClient, faceCatalogue, "ubiq.face.");
     }
 
-    public void AttachRandomHat(Ubiq.Avatars.Avatar avatar)
+    public void AttachHatOnSpawn(int idx, Ubiq.Avatars.Avatar avatar, AccessorySlot arg_slot)
     {
-        // Verify valid inputs.
-        if (accessoryCatalogue.prefabs == null || accessoryCatalogue.prefabs.Count == 0 || avatar == null)
+        PrefabCatalogue catalogue;
+        NetworkSpawner spawner;
+        string name;
+        switch (arg_slot)
+        {
+            case AccessorySlot.Head:
+                catalogue = headCatalogue;
+                spawner = headSpawner;
+                name = "NetworkHead";
+                break;
+            case AccessorySlot.Neck:
+                catalogue = neckCatalogue;
+                spawner = neckSpawner;
+                name = "NetworkNeck";
+                break;
+            case AccessorySlot.Back:
+                catalogue = backCatalogue;
+                spawner = backSpawner;
+                name = "NetworkBack";
+                break;
+            case AccessorySlot.Face:
+                catalogue = faceCatalogue;
+                spawner = faceSpawner;
+                name = "NetworkFace";
+                break;
+            default:
+                return;
+        }
+
+        if (catalogue.prefabs == null || catalogue.prefabs.Count == 0 || avatar == null)
         {
             return;
         }
 
-        // Get the FloatingAvatar component that holds the head reference.
-        FloatingAvatar floatingAvatar = avatar.GetComponentInChildren<FloatingAvatar>();
-        if (floatingAvatar == null || floatingAvatar.head == null)
-        {
-            Debug.LogWarning("FloatingAvatar component or head transform not found on avatar");
-            return;
-        }
-        Transform headTransform = floatingAvatar.head;
+        GameObject randomHatPrefab = catalogue.prefabs[idx];
 
-        // Remove any previously attached hat using network despawn.
-        Transform existingHat = headTransform.Find("NetworkHat");
-        if (existingHat != null)
-        {
-            // Use the NetworkSpawner's despawn to remove the networked object.
-            spawner.Despawn(existingHat.gameObject);
-        }
-
-        // Select a random hat prefab.
-        var idx = Random.Range(0, accessoryCatalogue.prefabs.Count);
-        GameObject randomHatPrefab = accessoryCatalogue.prefabs[idx];
-
-        // Spawn the hat as a networked object.
         GameObject newHat = spawner.SpawnWithPeerScope(randomHatPrefab);
-        
-        newHat.name = "NetworkHat"; // so we can easily find and remove it later
+        newHat.name = name;
 
-        // Parent the hat to the head transform.
-        newHat.transform.SetParent(headTransform, false);
-        newHat.transform.localPosition = Vector3.zero;
-        newHat.transform.localRotation = Quaternion.identity;
+        StartCoroutine(attachHatExternal(newHat, avatar, arg_slot, idx));
+    }
 
-        // Disable any physics so it stays fixed to the head.
-        Rigidbody rb = newHat.GetComponent<Rigidbody>();
-        if (rb != null)
+    public void AttachRandomHat(Ubiq.Avatars.Avatar avatar, AccessorySlot arg_slot)
+    {
+        PrefabCatalogue catalogue;
+        NetworkSpawner spawner;
+        string name;
+        switch (arg_slot)
         {
-            rb.isKinematic = true;
+            case AccessorySlot.Head: 
+                catalogue = headCatalogue;
+                spawner = headSpawner;
+                name = "NetworkHead";
+                break;
+            case AccessorySlot.Neck: 
+                catalogue = neckCatalogue; 
+                spawner = neckSpawner;
+                name = "NetworkNeck";
+                break;
+            case AccessorySlot.Back: 
+                catalogue = backCatalogue; 
+                spawner = backSpawner;
+                name = "NetworkBack";
+                break;
+            case AccessorySlot.Face: 
+                catalogue = faceCatalogue; 
+                spawner = faceSpawner;
+                name = "NetworkFace";
+                break;
+            default:
+                return;
         }
 
-        // Disable the Collider
-        Collider col = newHat.GetComponent<Collider>();
-        if (col != null)
+        if (catalogue.prefabs == null || catalogue.prefabs.Count == 0 || avatar == null)
         {
-            col.enabled = false;
+            return;
+        }
+
+        var idx = Random.Range(0, catalogue.prefabs.Count);
+        GameObject randomHatPrefab = catalogue.prefabs[idx];
+
+        GameObject newHat = spawner.SpawnWithPeerScope(randomHatPrefab);
+        newHat.name = name;
+
+        StartCoroutine(attachHatExternal(newHat, avatar, arg_slot, idx));
+    }
+
+    private IEnumerator attachHatExternal(GameObject hat, Ubiq.Avatars.Avatar avatar, AccessorySlot arg_slot, int idx)
+    {
+        yield return new WaitForSeconds(0.2f); // Ubiq does not give me a way of telling if the hat has spawned for other users, it seems?
+
+        HatNetworkedObject hatNetworkedObject = hat.GetComponent<HatNetworkedObject>();
+        if (hatNetworkedObject != null)
+        {
+            hatNetworkedObject.accessoryManager = this;
+            hatNetworkedObject.collisionsEnabled = false;
+            hatNetworkedObject.AttachHat(avatar, arg_slot);
+            hatNetworkedObject.idx = idx;
+        }
+        else
+        {
+            Debug.LogWarning("HatNetworkedObject component not found on spawned hat.");
+        }
+    }
+
+    public void SpawnRandomHat(AccessorySlot arg_slot)
+    {
+        PrefabCatalogue catalogue;
+        NetworkSpawner spawner;
+        string name;
+        switch (arg_slot)
+        {
+            case AccessorySlot.Head:
+                catalogue = headCatalogue;
+                spawner = headSpawner;
+                name = "NetworkHead";
+                break;
+            case AccessorySlot.Neck:
+                catalogue = neckCatalogue;
+                spawner = neckSpawner;
+                name = "NetworkNeck";
+                break;
+            case AccessorySlot.Back:
+                catalogue = backCatalogue;
+                spawner = backSpawner;
+                name = "NetworkBack";
+                break;
+            case AccessorySlot.Face:
+                catalogue = faceCatalogue;
+                spawner = faceSpawner;
+                name = "NetworkFace";
+                break;
+            default:
+                return;
+        }
+
+        if (catalogue.prefabs == null || catalogue.prefabs.Count == 0)
+        {
+            Debug.Log("SpawnRandomHat call invalid");
+            return;
+        }
+
+        var idx = Random.Range(0, catalogue.prefabs.Count);
+        GameObject accessoryPrefab = catalogue.prefabs[idx];
+
+        GameObject accessory = spawner.SpawnWithPeerScope(accessoryPrefab);
+        accessory.transform.localPosition += new Vector3(1, 3, 1);
+        accessory.name = name;
+
+        HatNetworkedObject hatNetworkedObject = accessory.GetComponent<HatNetworkedObject>();
+        if (hatNetworkedObject != null)
+        {
+            hatNetworkedObject.accessoryManager = this;
+            hatNetworkedObject.collisionsEnabled = true;
+            hatNetworkedObject.idx = idx;
+        }
+        else
+        {
+            Debug.LogWarning("HatNetworkedObject component not found on spawned hat");
+        }
+    }
+
+    public HatNetworkedObject SpawnHat(int idx, bool collisions, AccessorySlot arg_slot)
+    {
+        PrefabCatalogue catalogue;
+        NetworkSpawner spawner;
+        string name;
+        switch (arg_slot)
+        {
+            case AccessorySlot.Head:
+                catalogue = headCatalogue;
+                spawner = headSpawner;
+                name = "NetworkHead";
+                break;
+            case AccessorySlot.Neck:
+                catalogue = neckCatalogue;
+                spawner = neckSpawner;
+                name = "NetworkNeck";
+                break;
+            case AccessorySlot.Back:
+                catalogue = backCatalogue;
+                spawner = backSpawner;
+                name = "NetworkBack";
+                break;
+            case AccessorySlot.Face:
+                catalogue = faceCatalogue;
+                spawner = faceSpawner;
+                name = "NetworkFace";
+                break;
+            default:
+                return null;
+        }
+
+        if (catalogue.prefabs == null || catalogue.prefabs.Count == 0)
+        {
+            Debug.Log("SpawnRandomHat call invalid");
+            return null;
+        }
+
+        GameObject accessoryPrefab = catalogue.prefabs[idx];
+
+        GameObject accessory = spawner.SpawnWithPeerScope(accessoryPrefab);
+        accessory.transform.localPosition += new Vector3(1, 3, 1);
+        accessory.name = name;
+
+        HatNetworkedObject hatNetworkedObject = accessory.GetComponent<HatNetworkedObject>();
+        if (hatNetworkedObject != null)
+        {
+            hatNetworkedObject.accessoryManager = this;
+            hatNetworkedObject.collisionsEnabled = collisions;
+            hatNetworkedObject.idx = idx;
+            return hatNetworkedObject;
+        }
+        else
+        {
+            Debug.LogWarning("HatNetworkedObject component not found on spawned hat");
+            return null;
         }
     }
 }

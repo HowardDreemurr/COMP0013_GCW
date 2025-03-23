@@ -7,10 +7,10 @@ using UnityEngine;
 /// </summary>
 public class FloatingAvatar : MonoBehaviour
 {
-    public Transform head;
-    public Transform torso;
-    public Transform leftHand;
-    public Transform rightHand;
+    public Transform head; // Floating_Head
+    public Transform torso; // Floating_Torso_A
+    public Transform leftHand; // Floating_LeftHand_A
+    public Transform rightHand; // Floating_RightHand_A
 
     public Renderer headRenderer;
     public Renderer torsoRenderer;
@@ -19,7 +19,6 @@ public class FloatingAvatar : MonoBehaviour
 
     public Transform baseOfNeckHint;
 
-    // public float torsoFacingHandsWeight;
     public AnimationCurve torsoFootCurve;
 
     public AnimationCurve torsoFacingCurve;
@@ -48,6 +47,20 @@ public class FloatingAvatar : MonoBehaviour
         {
             texturedAvatar.OnTextureChanged.AddListener(TexturedAvatar_OnTextureChanged);
         }
+
+        // Ensure MeshCollider is enabled on head
+        // We'll need this for putting hats on people since the capsule hitbox for avatars is actually a part of something completely separate to avatars
+        if (head != null)
+        {
+            MeshCollider meshCollider = head.GetComponent<MeshCollider>();
+            if (meshCollider == null)
+            {
+                meshCollider = head.gameObject.AddComponent<MeshCollider>();
+            }
+            meshCollider.convex = true; // Ensures it can be a trigger
+            meshCollider.isTrigger = true; // Enables trigger mode
+            meshCollider.enabled = true;
+        }
     }
 
     private void OnDisable()
@@ -67,7 +80,6 @@ public class FloatingAvatar : MonoBehaviour
 
     private void HeadAndHandsEvents_OnHeadUpdate(InputVar<Pose> pose)
     {
-        // Debug.Log("Head update" + pose.valid +"|" +pose.value.position + "|" + pose.value.rotation);
         if (!pose.valid)
         {
             if (!lastGoodHeadPose.valid)
@@ -141,26 +153,6 @@ public class FloatingAvatar : MonoBehaviour
         var headFwd = head.forward;
         headFwd.y = 0;
 
-        // Hands: Imagine line between hands, take normal (in transverse plane)
-        // Use head orientation as a hint to give us which normal to use
-        // var handsLine = rightHand.position - leftHand.position;
-        // var handsFwd = new Vector3(-handsLine.z,0,handsLine.x);
-        // if (Vector3.Dot(handsFwd,headFwd) < 0)
-        // {
-        //     handsFwd = new Vector3(handsLine.z,0,-handsLine.x);
-        // }
-        // handsFwdStore = handsFwd;
-
-        // var headRot = Quaternion.LookRotation(headFwd,Vector3.up);
-        // var handsRot = Quaternion.LookRotation(handsFwd,Vector3.up);
-
-        // // Rotation is handsRotation capped to a distance from headRotation
-        // var headToHandsAngle = Quaternion.Angle(headRot,handsRot);
-        // Debug.Log(headToHandsAngle);
-        // var rot = Quaternion.RotateTowards(headRot,handsRot,Mathf.Clamp(headToHandsAngle,-torsoFacingHandsWeight,torsoFacingHandsWeight));
-
-        // // var rot = Quaternion.SlerpUnclamped(handsRot,headRot,torsoFacingHeadToHandsWeightRatio);
-
         var rot = Quaternion.LookRotation(headFwd, Vector3.up);
         var angle = Quaternion.Angle(torsoFacing, rot);
         var rotateAngle = Mathf.Clamp(Time.deltaTime * torsoFacingCurve.Evaluate(Mathf.Abs(angle)), 0, angle);
@@ -170,13 +162,4 @@ public class FloatingAvatar : MonoBehaviour
         torso.position = neckPosition;
         torso.rotation = Quaternion.FromToRotation(Vector3.down, footPosition - neckPosition) * torsoFacing;
     }
-
-    // private Vector3 handsFwdStore;
-
-    // private void OnDrawGizmos()
-    // {
-    //     Gizmos.color = Color.blue;
-    //     Gizmos.DrawLine(head.position, footPosition);
-    //     // Gizmos.DrawLine(head.position,head.position + handsFwdStore);
-    // }
 }
