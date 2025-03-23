@@ -259,8 +259,6 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
             physicsOwner = false;
         }
 
-        Debug.Log("Received message with parent = " + msg.parentNameOrId);
-
         if (!string.IsNullOrEmpty(msg.parentNameOrId) && !isParented)
         {
             // NOTE: To unparent the hat, I guess you could send a non-null transform which is just the root of the scene?

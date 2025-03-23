@@ -95,15 +95,11 @@ public class AccessoryCauldronButton : MonoBehaviour
         AccessoryPotion accessoryPotion = potion.GetComponent<AccessoryPotion>();
         if (accessoryPotion != null)
         {
-            // TODO: Setting all of this externally might A) Not synchronise and B) Have race conditions
-            // Could try setting these before calling SpawnWithPeerScope? Needs testing
-            accessoryPotion.accessoryManager = accessoryManager;
-
+            // Possible race condition
             accessoryPotion.accessories.head = accessoryPotionMaker.accessories.head;
             accessoryPotion.accessories.neck = accessoryPotionMaker.accessories.neck;
             accessoryPotion.accessories.back = accessoryPotionMaker.accessories.back;
             accessoryPotion.accessories.face = accessoryPotionMaker.accessories.face;
-
             potions.Add(accessoryPotion);
         }
         else

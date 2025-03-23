@@ -5,6 +5,7 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit;
 using NUnit.Framework;
 using System.Collections.Generic;
+using Mono.Cecil.Cil;
 
 public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
 {
@@ -27,14 +28,13 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
 
     private Vector3 initialSize;
 
-    public AccessoryManager accessoryManager; // Injected by design-time button that holds reference to accessoryManager
+    private AccessoryManager accessoryManager; // Injected by design-time button that holds reference to accessoryManager
 
     private NetworkContext context;
     private Vector3 lastPosition;
     private Quaternion lastRotation;
 
     private bool owner = false;
-    private bool isOwnedBySomeoneElse = false;
 
     public struct Accessories
     {
@@ -46,23 +46,29 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
 
     public Accessories accessories;
 
-    void Start()
+    private enum CollisionState
     {
-        context = NetworkScene.Register(this);
+        Unset,
+        Enabled,
+        Disabled
+    }
 
+    void Awake()
+    {
         rigidBody = GetComponent<Rigidbody>();
-        boxCollider = GetComponent<BoxCollider>();
-
         if (rigidBody == null)
         {
             rigidBody = gameObject.AddComponent<Rigidbody>();
-            rigidBody.useGravity = true;
+            rigidBody.useGravity = false; // Start with gravity disabled
             rigidBody.isKinematic = false;
         }
+
+        boxCollider = GetComponent<BoxCollider>();
         if (boxCollider == null)
         {
             boxCollider = gameObject.AddComponent<BoxCollider>();
         }
+
         if (triggerCollider == null)
         {
             // Create a separate trigger collider for testing velocity on collision and breaking potion if other some threshold
@@ -70,42 +76,45 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             triggerCollider.isTrigger = true;
         }
 
-        collisionsEnabled = true;
-
-        if (!collisionsEnabled)
-        {
-            //DisablePhysics();
-        }
-
         // Grabbing
-        var grab = gameObject.GetComponent<XRGrabInteractable>();
+        XRGrabInteractable grab = gameObject.GetComponent<XRGrabInteractable>();
         if (!grab)
         {
             grab = gameObject.AddComponent<XRGrabInteractable>();
         }
         grab.selectEntered.AddListener((SelectEnterEventArgs args) =>
         {
-            // TODO: Check that this is only called on the client which grabs the potion and not on all clients when someone in the room grabs the potion
+            Debug.Log("(Potion) Grabed");
+            DisablePhysics();
             owner = true;
-            context.SendJson(new TransformMessage
-            {
-                position = transform.position,
-                rotation = transform.rotation,
-                smashed = smashed,
-                isOwnedBySomeoneElse = true
-            });
         });
         grab.selectExited.AddListener((SelectExitEventArgs args) =>
         {
+            Debug.Log("(Potion) Dropped");
+            EnablePhysics();
             owner = false;
-            context.SendJson(new TransformMessage
-            {
-                position = transform.position,
-                rotation = transform.rotation,
-                smashed = smashed,
-                isOwnedBySomeoneElse = false
-            });
         });
+
+        // Retrieve AccessoryManager
+        accessoryManager = FindFirstObjectByType<AccessoryManager>();
+        if (accessoryManager == null)
+        {
+            Debug.LogWarning("(Potion) Local AccessoryManager not found");
+            return;
+        }
+    }
+
+    void Start()
+    {
+        context = NetworkScene.Register(this);
+        collisionsEnabled = true;
+
+        if (rigidBody != null)
+        {
+            // Attempt 2 at disabling gravity, because apparently it won't work in Awake
+            rigidBody.useGravity = false;
+            rigidBody.isKinematic = false;
+        }
     }
 
     // Update is called once per frame
@@ -118,13 +127,16 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             lastPosition = transform.position;
             lastRotation = transform.rotation;
 
-            context.SendJson(new TransformMessage
+            if (owner)
             {
-                position = transform.position,
-                rotation = transform.rotation,
-                smashed = smashed,
-                isOwnedBySomeoneElse = isOwnedBySomeoneElse & owner
-            });
+                context.SendJson(new TransformMessage
+                {
+                    position = transform.position,
+                    rotation = transform.rotation,
+                    smashed = smashed,
+                    collisions = CollisionState.Unset
+                });
+            }
         }
 
         if (smashed && !expanding)
@@ -136,7 +148,6 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
         if (expanding)
         {
             timer += Time.deltaTime;
-            // Stop expanding after duration is reached
             if (timer >= expansionDuration)
             {
                 Debug.Log("Potion stopped expanding");
@@ -147,15 +158,21 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
 
     private void OnTriggerEnter(Collider other)
     {
+        // Ignore collisions with other AccessoryPotions
+        if (other.GetComponentInParent<AccessoryPotion>() != null && other.gameObject != this.gameObject)
+        {
+            return;
+        }
+
         if (collisionsEnabled)
         {
             float velocity = rigidBody.linearVelocity.magnitude;
 
             Debug.Log("Potion collided with velocity " + velocity);
-            Debug.Log("Head: " + accessories.head + " Neck :" + accessories.neck + " Face: " + accessories.face + " Back: " + accessories.back);
 
             if (velocity > 0.1)
             {
+                Debug.Log("Head: " + accessories.head + " Neck :" + accessories.neck + " Face: " + accessories.face + " Back: " + accessories.back);
                 SmashPotion();
             }
         }
@@ -168,22 +185,9 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             {
                 Debug.Log("Potion touched avatar " + avatar.name);
 
-                HatNetworkedObject head = accessoryManager.SpawnHat(accessories.head, false, AccessorySlot.Head);
-                HatNetworkedObject back = accessoryManager.SpawnHat(accessories.back, false, AccessorySlot.Back);
-                HatNetworkedObject face = accessoryManager.SpawnHat(accessories.face, false, AccessorySlot.Face);
-
-                if (head != null)
-                {
-                    head.AttachHat(avatar, AccessorySlot.Head);
-                }
-                if (back != null)
-                {
-                    back.AttachHat(avatar, AccessorySlot.Back);
-                }
-                if (face != null)
-                {
-                    face.AttachHat(avatar, AccessorySlot.Face);
-                }
+                accessoryManager.AttachHatOnSpawn(accessories.head, avatar, AccessorySlot.Head);
+                accessoryManager.AttachHatOnSpawn(accessories.back, avatar, AccessorySlot.Back);
+                accessoryManager.AttachHatOnSpawn(accessories.face, avatar, AccessorySlot.Face);
 
                 affectedAvatars.Add(avatar.name); // don't apply to this avatar again or else it just freezes the game
             }
@@ -192,22 +196,27 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
 
     private void SmashPotion()
     {
-        Debug.Log("Potion was smashed");
+        Debug.Log("Potion smashed");
+
+        owner = false;
 
         if (rigidBody != null)
         {
             rigidBody.isKinematic = true;
         }
+
         MeshRenderer renderer = GetComponent<MeshRenderer>();
         if (renderer != null)
         {
-            // renderer.enabled = false;
+            //renderer.enabled = false;
         }
+
         if (triggerCollider != null)
         {
             initialSize = triggerCollider.size;
             expanding = true; // Start expansion
         }
+
         var grab = GetComponent<XRGrabInteractable>();
         if (grab != null)
         {
@@ -220,7 +229,14 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
 
         triggerCollider.size = initialSize * expansionSize;
 
-        // NOTE: If this does not synchronize potion smashing well, put back the message here
+        //
+        context.SendJson(new TransformMessage
+        {
+            position = transform.position,
+            rotation = transform.rotation,
+            smashed = true,
+            collisions = CollisionState.Disabled
+        });
     }
 
     void OnDrawGizmos()
@@ -238,38 +254,77 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
         public Vector3 position;
         public Quaternion rotation;
         public bool smashed;
-        public bool isOwnedBySomeoneElse;
+        public CollisionState collisions;
     }
 
     public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
     {
         var msg = message.FromJson<TransformMessage>();
 
-        if (!owner && msg.isOwnedBySomeoneElse)
+        if (!owner)
         {
-            // Someone picked up the potion (not us)
-            isOwnedBySomeoneElse = true;
-            rigidBody.useGravity = false;
-            rigidBody.isKinematic = true;
+            transform.position = msg.position;
+            transform.rotation = msg.rotation;
+            lastPosition = transform.position;
+            lastRotation = transform.rotation;
         }
-        else if (isOwnedBySomeoneElse && !msg.isOwnedBySomeoneElse)
+        if (msg.collisions == CollisionState.Enabled && !collisionsEnabled)
         {
-            // Someone dropped the potion (not us)
-            isOwnedBySomeoneElse = false;
-            rigidBody.useGravity = true;
-            rigidBody.isKinematic = false;
+            EnablePhysics();
+            owner = false;
         }
-
-        transform.position = msg.position;
-        transform.rotation = msg.rotation;
-
-        lastPosition = transform.position;
-        lastRotation = transform.rotation;
+        else if (msg.collisions == CollisionState.Disabled && collisionsEnabled)
+        {
+            DisablePhysics();
+            owner = false;
+        }
 
         if (msg.smashed && !expanding)
         {
-            smashed = true;
             // If !msg.smashed, just keep it as is; we want to hold true until we finish calling SmashPotion locally
+            smashed = true;
         }
+    }
+
+    public void DisablePhysics()
+    {
+        Debug.Log("(Potion) Disabling Physics");
+
+        collisionsEnabled = false;
+        if (rigidBody != null)
+        {
+            rigidBody.isKinematic = true;
+            rigidBody.detectCollisions = false;
+            rigidBody.useGravity = false;
+        }
+
+        context.SendJson(new TransformMessage
+        {
+            position = transform.position,
+            rotation = transform.rotation,
+            smashed = smashed,
+            collisions = CollisionState.Disabled
+        });
+    }
+
+    public void EnablePhysics()
+    {
+        Debug.Log("(Potion) Enabling Physics");
+
+        collisionsEnabled = true;
+        if (rigidBody != null)
+        {
+            rigidBody.isKinematic = false;
+            rigidBody.detectCollisions = true;
+            rigidBody.useGravity = true;
+        }
+
+        context.SendJson(new TransformMessage
+        {
+            position = transform.position,
+            rotation = transform.rotation,
+            smashed = smashed,
+            collisions = CollisionState.Enabled
+        });
     }
 }

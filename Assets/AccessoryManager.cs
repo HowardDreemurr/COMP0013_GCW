@@ -35,6 +35,50 @@ public class AccessoryManager : MonoBehaviour
         faceSpawner = new NetworkSpawner(networkScene, RoomClient, faceCatalogue, "ubiq.face.");
     }
 
+    public void AttachHatOnSpawn(int idx, Ubiq.Avatars.Avatar avatar, AccessorySlot arg_slot)
+    {
+        PrefabCatalogue catalogue;
+        NetworkSpawner spawner;
+        string name;
+        switch (arg_slot)
+        {
+            case AccessorySlot.Head:
+                catalogue = headCatalogue;
+                spawner = headSpawner;
+                name = "NetworkHead";
+                break;
+            case AccessorySlot.Neck:
+                catalogue = neckCatalogue;
+                spawner = neckSpawner;
+                name = "NetworkNeck";
+                break;
+            case AccessorySlot.Back:
+                catalogue = backCatalogue;
+                spawner = backSpawner;
+                name = "NetworkBack";
+                break;
+            case AccessorySlot.Face:
+                catalogue = faceCatalogue;
+                spawner = faceSpawner;
+                name = "NetworkFace";
+                break;
+            default:
+                return;
+        }
+
+        if (catalogue.prefabs == null || catalogue.prefabs.Count == 0 || avatar == null)
+        {
+            return;
+        }
+
+        GameObject randomHatPrefab = catalogue.prefabs[idx];
+
+        GameObject newHat = spawner.SpawnWithPeerScope(randomHatPrefab);
+        newHat.name = name;
+
+        StartCoroutine(attachHatExternal(newHat, avatar, arg_slot, idx));
+    }
+
     public void AttachRandomHat(Ubiq.Avatars.Avatar avatar, AccessorySlot arg_slot)
     {
         PrefabCatalogue catalogue;
