@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5622171077518558016}
   - component: {fileID: 3261484580099640237}
+  - component: {fileID: 8828386018747608762}
   m_Layer: 0
   m_Name: AudioClockTicking
   m_TagString: Untagged
@@ -44,7 +45,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 597bfe00075c55a4f867ff09fa8a940b, type: 3}
   m_Resource: {fileID: 8300000, guid: 597bfe00075c55a4f867ff09fa8a940b, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -129,3 +130,15 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &8828386018747608762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 586031064699097860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82236af5eba40dd4db8e25c4c76175cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

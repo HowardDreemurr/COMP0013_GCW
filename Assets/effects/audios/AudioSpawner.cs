@@ -27,6 +27,5 @@ public class AudioSpawner : MonoBehaviour
         var instance = NetworkSpawnManager.Find(this).SpawnWithPeerScope(audioPrefab);
 
         instance.transform.position = transform.position;
-        instance.transform.rotation = transform.rotation;
     }
 }

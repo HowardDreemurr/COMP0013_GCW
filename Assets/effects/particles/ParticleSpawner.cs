@@ -25,9 +25,7 @@ public class ParticleSpawner : MonoBehaviour
     private void SpawnParticle(SelectEnterEventArgs args)
     {
         var instance = NetworkSpawnManager.Find(this).SpawnWithPeerScope(particlePrefab);
-
         instance.transform.position = transform.position;
-        instance.transform.rotation = transform.rotation;
     }
 }
 

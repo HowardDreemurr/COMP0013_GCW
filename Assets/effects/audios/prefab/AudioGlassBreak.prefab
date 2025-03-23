@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2959951009765702306}
   - component: {fileID: 4637713636670254405}
+  - component: {fileID: 1510117932014201007}
   m_Layer: 0
   m_Name: AudioGlassBreak
   m_TagString: Untagged
@@ -44,7 +45,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 0952d7093a9bd564aa432ebd7757299e, type: 3}
   m_Resource: {fileID: 8300000, guid: 0952d7093a9bd564aa432ebd7757299e, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -129,3 +130,15 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1510117932014201007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8529788867650411095}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82236af5eba40dd4db8e25c4c76175cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

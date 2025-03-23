@@ -52,6 +52,23 @@ public class TexturedAvatar : MonoBehaviour
             }
         }
 
+        if (!avatar.IsLocal)
+        {
+            var peer = avatar.Peer;
+
+            var uuid = peer["ubiq.avatar.texture.uuid"];
+            var blob = peer["ubiq.avatar.texture.blob"];
+
+            if (!string.IsNullOrWhiteSpace(blob))
+            {
+                SetCustomTexture(blob);
+            }
+            else if (!string.IsNullOrWhiteSpace(uuid))
+            {
+                SetTexture(uuid);
+            }
+        }
+
         roomClient.OnPeerUpdated.AddListener(RoomClient_OnPeerUpdated);
     }
 
