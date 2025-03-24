@@ -3395,6 +3395,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9ba0727c023a9a4d8ca8b57cc7d685d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  avatarCatalogue: {fileID: 11400000, guid: 3300deaa4c6009c4f90220b3177592b9, type: 2}
 --- !u!1001 &1446258569
 PrefabInstance:
   m_ObjectHideFlags: 0

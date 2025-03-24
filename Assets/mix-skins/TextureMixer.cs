@@ -146,7 +146,7 @@ public class TextureMixer : MonoBehaviour
     }
 
 
-    private Texture2D Base64ToTexture2D(string base64)
+    public Texture2D Base64ToTexture2D(string base64)
     {
         byte[] pngData = Convert.FromBase64String(base64);
         Texture2D texture = new Texture2D(2, 2);
@@ -154,7 +154,7 @@ public class TextureMixer : MonoBehaviour
         return texture;
     }
 
-    private string Texture2DToBase64(Texture2D texture)
+    public string Texture2DToBase64(Texture2D texture)
     {
         byte[] pngData = texture.EncodeToPNG();
         string base64 = Convert.ToBase64String(pngData);

@@ -213,6 +213,17 @@ public class TexturedAvatar : MonoBehaviour
 
     public Texture2D GetTexture()
     {
+        if (cached == null)
+        {
+            if (!string.IsNullOrWhiteSpace(blob))
+            {
+                cached = Base64ToTexture2D(blob);
+            }
+            else if (!string.IsNullOrWhiteSpace(uuid))
+            {
+                cached = Textures.Get(uuid);
+            }
+        }
         return cached;
     }
 
