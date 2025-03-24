@@ -198,6 +198,7 @@ public class AccessoryManager : MonoBehaviour
             hatNetworkedObject.accessoryManager = this;
             hatNetworkedObject.collisionsEnabled = true;
             hatNetworkedObject.idx = idx;
+            StartCoroutine(syncIdxExternal(hatNetworkedObject, idx));
         }
         else
         {
@@ -257,6 +258,7 @@ public class AccessoryManager : MonoBehaviour
             hatNetworkedObject.accessoryManager = this;
             hatNetworkedObject.collisionsEnabled = collisions;
             hatNetworkedObject.idx = idx;
+            StartCoroutine(syncIdxExternal(hatNetworkedObject, idx));
             return hatNetworkedObject;
         }
         else
@@ -274,5 +276,12 @@ public class AccessoryManager : MonoBehaviour
 
             instance.transform.position = position;
         }
+    }
+
+    private IEnumerator syncIdxExternal(HatNetworkedObject hat, int arg_idx)
+    {
+        yield return new WaitForSeconds(0.2f); // Ubiq does not give me a way of telling if the hat has spawned for other users, it seems?
+
+        hat.syncIdx(arg_idx);
     }
 }

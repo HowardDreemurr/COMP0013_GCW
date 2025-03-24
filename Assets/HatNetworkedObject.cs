@@ -6,6 +6,8 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.Windows;
 using static Ubiq.Avatars.AvatarInput;
+using UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets;
+using NUnit.Framework.Interfaces;
 
 // NB: This is called 'HatNetworkedObject' as a holdover, it can be thrown onto any accessory, not just hats
 public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
@@ -37,6 +39,15 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
         Unset,
         Enabled,
         Disabled
+    }
+
+    private struct HatMessage
+    {
+        public Vector3 position;
+        public Quaternion rotation;
+        public CollisionState collisions;
+        public string parentNameOrId;
+        public int idx;
     }
 
     void Awake()
@@ -128,7 +139,8 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
                     position = transform.position,
                     rotation = transform.rotation,
                     collisions = CollisionState.Unset,
-                    parentNameOrId = ""
+                    parentNameOrId = "",
+                    idx = -2
                 });
             }
         }
@@ -244,6 +256,12 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
     {
         var msg = message.FromJson<HatMessage>();
 
+        if (msg.idx != -2)
+        {
+            idx = msg.idx;
+            return;
+        }
+
         if (!physicsOwner)
         {
             transform.position = msg.position;
@@ -312,7 +330,8 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
             position = transform.position,
             rotation = transform.rotation,
             collisions = CollisionState.Disabled,
-            parentNameOrId = parentAvatarId
+            parentNameOrId = parentAvatarId,
+            idx = -2
         });
     }
 
@@ -332,16 +351,9 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
             position = transform.position,
             rotation = transform.rotation,
             collisions = CollisionState.Enabled,
-            parentNameOrId = ""
+            parentNameOrId = "", 
+            idx = -2
         });
-    }
-
-    private struct HatMessage
-    {
-        public Vector3 position;
-        public Quaternion rotation;
-        public CollisionState collisions;
-        public string parentNameOrId;
     }
 
     private void SpawnEffects(GameObject prefab, Vector3 position)
@@ -352,5 +364,17 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
 
             instance.transform.position = position;
         }
+    }
+
+    public void syncIdx(int arg_idx)
+    {
+        context.SendJson(new HatMessage
+        {
+            position = transform.position,
+            rotation = transform.rotation,
+            collisions = CollisionState.Unset,
+            parentNameOrId = "",
+            idx = arg_idx
+        });
     }
 }

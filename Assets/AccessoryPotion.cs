@@ -346,7 +346,7 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
         {
             accessories.face = msg.faceIdx;
         }
-        if (!string.IsNullOrEmpty(msg.textureBlob))
+        if (!string.IsNullOrEmpty(msg.textureBlob)) // Only update this if msg.textureBlob != ""
         {
             accessories.textureBlob = msg.textureBlob;
         }
@@ -418,7 +418,7 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             neckIdx = accessories.neck,
             backIdx = accessories.back,
             faceIdx = accessories.face,
-            textureBlob = ""
+            textureBlob = accessories.textureBlob
         });
     }
 

@@ -76,35 +76,26 @@ public class AccessoryPotionMaker : MonoBehaviour
             {
                 case AccessorySlot.Head:
                     accessories.head = hat.idx;
-                    accessoryManager.headSpawner.Despawn(hat.gameObject);
                     break;
                 case AccessorySlot.Neck:
                     accessories.neck = hat.idx;
-                    accessoryManager.neckSpawner.Despawn(hat.gameObject);
                     break;
                 case AccessorySlot.Back:
                     accessories.back = hat.idx;
-                    accessoryManager.backSpawner.Despawn(hat.gameObject);
                     break;
                 case AccessorySlot.Face:
                     accessories.face = hat.idx;
-                    accessoryManager.faceSpawner.Despawn(hat.gameObject);
                     break;
                 default:
                     return;
             }
 
-            context.SendJson(new Accessories
-            {
-                head = accessories.head,
-                neck = accessories.neck,
-                back = accessories.back,
-                face = accessories.face,
-                textureBlob = accessories.textureBlob == null ? "" : accessories.textureBlob
-            });
+            Destroy(hat.gameObject);
 
             SpawnEffects(ParticlePrefab, transform.position);
             SpawnEffects(AudioPrefab, transform.position);
+
+            Debug.Log("Head=" + accessories.head + " Neck=" + accessories.neck + " Back=" + accessories.back + " Face=" + accessories.face);
         }
         else if (head != null)
         {
@@ -120,7 +111,6 @@ public class AccessoryPotionMaker : MonoBehaviour
 
             Texture2D fakeAvatarTexture = head.avatarTexture;
             accessories.textureBlob = textureMixer.AddIngradient(operationNumber, fakeAvatarTexture, accessories.textureBlob);
-            //remoteAvatarInteractableAttacher.spawner.Despawn(head.gameObject);
             Destroy(head.gameObject);
             operationNumber++;
 
