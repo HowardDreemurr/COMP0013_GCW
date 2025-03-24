@@ -18,6 +18,9 @@ public class AccessoryCauldronButton : MonoBehaviour
     public PrefabCatalogue potionCatalogue; 
     public RoomClient RoomClient { get; private set; }
 
+    public GameObject ParticlePrefab;
+    public GameObject AudioPrefab;
+
     [SerializeField] private AccessoryManager accessoryManager;
     [SerializeField] private AccessoryPotionMaker accessoryPotionMaker;
     private XRSimpleInteractable interactable;
@@ -102,6 +105,9 @@ public class AccessoryCauldronButton : MonoBehaviour
             accessoryPotion.accessories.face = accessoryPotionMaker.accessories.face;
             potions.Add(accessoryPotion);
             StartCoroutine(syncPotionState(accessoryPotion));
+
+            SpawnEffects(ParticlePrefab, potion.transform.localPosition);
+            SpawnEffects(AudioPrefab, potion.transform.localPosition);
         }
     }
 
@@ -110,5 +116,15 @@ public class AccessoryCauldronButton : MonoBehaviour
         yield return new WaitForSeconds(0.2f);
 
         potion.syncState();
+    }
+
+    private void SpawnEffects(GameObject prefab, Vector3 position)
+    {
+        if (prefab)
+        {
+            var instance = NetworkSpawnManager.Find(this).SpawnWithPeerScope(prefab);
+
+            instance.transform.position = position;
+        }
     }
 }

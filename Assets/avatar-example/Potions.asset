@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Potions
   m_EditorClassIdentifier: 
   prefabs:
-  - {fileID: 8304551005270620439, guid: e70e7ef5cc8a82548b0e434ae1504fb4, type: 3}
+  - {fileID: 2565258039652035335, guid: a28c166141f62724aa5c9988987f202e, type: 3}

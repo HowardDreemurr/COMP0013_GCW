@@ -11,6 +11,9 @@ public class AccessoryPotionMaker : MonoBehaviour
     private float logInterval = 1f;
     private NetworkContext context;
 
+    public GameObject ParticlePrefab;
+    public GameObject AudioPrefab;
+
     public struct Accessories
     {
         public int head;
@@ -82,6 +85,9 @@ public class AccessoryPotionMaker : MonoBehaviour
                 back = accessories.back,
                 face = accessories.face
             });
+
+            SpawnEffects(ParticlePrefab, transform.position);
+            SpawnEffects(AudioPrefab, transform.position);
         }
     }
 
@@ -95,5 +101,15 @@ public class AccessoryPotionMaker : MonoBehaviour
         accessories.face = msg.face;
 
         Debug.Log("Head: " + accessories.head + " Neck: " + accessories.neck + " Back: " + accessories.back + " Face: " + accessories.face);
+    }
+
+    private void SpawnEffects(GameObject prefab, Vector3 position)
+    {
+        if (prefab)
+        {
+            var instance = NetworkSpawnManager.Find(this).SpawnWithPeerScope(prefab);
+
+            instance.transform.position = position;
+        }
     }
 }

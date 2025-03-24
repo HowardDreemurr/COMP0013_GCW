@@ -12,10 +12,11 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
 
     public GameObject ParticlePrefab;
     public GameObject AudioPrefab;
+
     public bool collisionsEnabled;
     public Rigidbody rigidBody;
-    public BoxCollider triggerCollider; // Implements 'splash' logic
-    public BoxCollider boxCollider; // Implements actual collisions
+    public SphereCollider triggerCollider; // Implements 'splash' logic
+    public SphereCollider boxCollider; // Implements actual collisions
 
     public float expansionDuration = 5f;
     public float expansionSize = 10f;
@@ -27,7 +28,7 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
 
     private List<string> affectedAvatars = new List<string>();
 
-    private Vector3 initialSize;
+    private float initialSize;
 
     private AccessoryManager accessoryManager; // Injected by design-time button that holds reference to accessoryManager
 
@@ -64,16 +65,16 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             rigidBody.isKinematic = false;
         }
 
-        boxCollider = GetComponent<BoxCollider>();
+        boxCollider = GetComponent<SphereCollider>();
         if (boxCollider == null)
         {
-            boxCollider = gameObject.AddComponent<BoxCollider>();
+            boxCollider = gameObject.AddComponent<SphereCollider>();
         }
 
         if (triggerCollider == null)
         {
             // Create a separate trigger collider for testing velocity on collision and breaking potion if other some threshold
-            triggerCollider = gameObject.AddComponent<BoxCollider>();
+            triggerCollider = gameObject.AddComponent<SphereCollider>();
             triggerCollider.isTrigger = true;
         }
 
@@ -218,7 +219,7 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
 
         if (triggerCollider != null)
         {
-            initialSize = triggerCollider.size;
+            initialSize = triggerCollider.radius;
             expanding = true; // Start expansion
         }
 
@@ -232,7 +233,7 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
         boxCollider.enabled = false;
         collisionsEnabled = false;
 
-        triggerCollider.size = initialSize * expansionSize;
+        triggerCollider.radius = initialSize * expansionSize;
 
         //
         context.SendJson(new TransformMessage
@@ -257,7 +258,7 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
         {
             Gizmos.color = Color.red;
             Gizmos.matrix = transform.localToWorldMatrix;
-            Gizmos.DrawWireCube(triggerCollider.center, triggerCollider.size);
+            Gizmos.DrawWireSphere(triggerCollider.center, triggerCollider.radius);
         }
     }
 

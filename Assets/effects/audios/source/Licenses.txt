@@ -9,3 +9,7 @@ scify-shutdown.wav by MATRIXXX_ -- https://freesound.org/s/523553/ -- License: C
 drop-cloth.wav by zembacraftworks -- https://freesound.org/s/428336/ -- License: Creative Commons 0
 
 Whoosh.wav by Speedenza -- https://freesound.org/s/168180/ -- License: Attribution NonCommercial 4.0
+
+bubbles.aif by kijjaz -- https://freesound.org/s/16740/ -- License: Creative Commons 0
+
+Pouring.wav -- https://freesound.org/s/220303/ -- License: Attribution 4.0

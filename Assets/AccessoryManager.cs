@@ -10,6 +10,9 @@ public class AccessoryManager : MonoBehaviour
 {
     public RoomClient RoomClient { get; private set; }
 
+    public GameObject ParticlePrefab;
+    public GameObject AudioPrefab;
+
     public NetworkSpawner headSpawner;
     public NetworkSpawner neckSpawner;
     public NetworkSpawner backSpawner;
@@ -186,6 +189,9 @@ public class AccessoryManager : MonoBehaviour
         accessory.transform.localPosition += new Vector3(0, 3, 4);
         accessory.name = name;
 
+        SpawnEffects(ParticlePrefab, accessory.transform.localPosition);
+        SpawnEffects(AudioPrefab, accessory.transform.localPosition);
+
         HatNetworkedObject hatNetworkedObject = accessory.GetComponent<HatNetworkedObject>();
         if (hatNetworkedObject != null)
         {
@@ -242,6 +248,9 @@ public class AccessoryManager : MonoBehaviour
         accessory.transform.localPosition += new Vector3(0, 3, 4);
         accessory.name = name;
 
+        SpawnEffects(ParticlePrefab, accessory.transform.localPosition);
+        SpawnEffects(AudioPrefab, accessory.transform.localPosition);
+
         HatNetworkedObject hatNetworkedObject = accessory.GetComponent<HatNetworkedObject>();
         if (hatNetworkedObject != null)
         {
@@ -254,6 +263,16 @@ public class AccessoryManager : MonoBehaviour
         {
             Debug.LogWarning("HatNetworkedObject component not found on spawned hat");
             return null;
+        }
+    }
+
+    private void SpawnEffects(GameObject prefab, Vector3 position)
+    {
+        if (prefab)
+        {
+            var instance = NetworkSpawnManager.Find(this).SpawnWithPeerScope(prefab);
+
+            instance.transform.position = position;
         }
     }
 }

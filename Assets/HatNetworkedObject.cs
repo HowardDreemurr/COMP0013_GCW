@@ -20,6 +20,8 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     public AccessorySlot slot;
 
+    public GameObject AudioPrefab;
+
     private NetworkContext context;
     private Vector3 lastPosition;
     private Quaternion lastRotation;
@@ -234,6 +236,8 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
         isParented = true;
 
         Debug.Log("Hat attached to " + avatar.name);
+
+        SpawnEffects(AudioPrefab, avatar.GetComponentInChildren<FloatingAvatar>().torso.position);
     }
 
     public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
@@ -338,5 +342,15 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
         public Quaternion rotation;
         public CollisionState collisions;
         public string parentNameOrId;
+    }
+
+    private void SpawnEffects(GameObject prefab, Vector3 position)
+    {
+        if (prefab)
+        {
+            var instance = NetworkSpawnManager.Find(this).SpawnWithPeerScope(prefab);
+
+            instance.transform.position = position;
+        }
     }
 }
