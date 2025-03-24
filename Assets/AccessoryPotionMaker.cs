@@ -120,7 +120,8 @@ public class AccessoryPotionMaker : MonoBehaviour
 
             Texture2D fakeAvatarTexture = head.avatarTexture;
             accessories.textureBlob = textureMixer.AddIngradient(operationNumber, fakeAvatarTexture, accessories.textureBlob);
-            remoteAvatarInteractableAttacher.spawner.Despawn(head.gameObject);
+            //remoteAvatarInteractableAttacher.spawner.Despawn(head.gameObject);
+            Destroy(head.gameObject);
             operationNumber++;
 
             context.SendJson(new Accessories
