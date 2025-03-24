@@ -149,3 +149,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea9fb6a8c25c68c43ba752c92453c5d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ParticlePrefab: {fileID: 8041105477772115659, guid: d3ccd44c78b549343b919e20ce751336, type: 3}
+  AudioPrefab: {fileID: 8529788867650411095, guid: 80fa2bd7cc8acbf4abef7349941207bd, type: 3}
+  collisionsEnabled: 0
+  rigidBody: {fileID: 0}
+  triggerCollider: {fileID: 0}
+  boxCollider: {fileID: 0}
+  expansionDuration: 5
+  expansionSize: 10
+  destroyed: 0

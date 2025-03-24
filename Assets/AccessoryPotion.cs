@@ -10,6 +10,8 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
 {
     public NetworkId NetworkId { get; set; }
 
+    public GameObject ParticlePrefab;
+    public GameObject AudioPrefab;
     public bool collisionsEnabled;
     public Rigidbody rigidBody;
     public BoxCollider triggerCollider; // Implements 'splash' logic
@@ -244,6 +246,9 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             backIdx = -2,
             faceIdx = -2
         });
+
+        SpawnEffects(ParticlePrefab, transform.position);
+        SpawnEffects(AudioPrefab, transform.position);
     }
 
     void OnDrawGizmos()
@@ -379,5 +384,15 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             backIdx = accessories.back,
             faceIdx = accessories.face
         });
+    }
+
+    private void SpawnEffects(GameObject prefab, Vector3 position)
+    {
+        if (prefab)
+        {
+            var instance = NetworkSpawnManager.Find(this).SpawnWithPeerScope(prefab);
+
+            instance.transform.position = position;
+        }
     }
 }
