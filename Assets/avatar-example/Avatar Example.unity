@@ -5088,6 +5088,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   triggerCollider: {fileID: 0}
   accessoryManager: {fileID: 1816713889}
+  remoteAvatarInteractableAttacher: {fileID: 1443208750}
+  operationNumber: 0
   ParticlePrefab: {fileID: 8041105477772115659, guid: d3ccd44c78b549343b919e20ce751336, type: 3}
   AudioPrefab: {fileID: 3171707044500767054, guid: 55382ec3869c0bd4a888f03120268180, type: 3}
 --- !u!1001 &1995168927
