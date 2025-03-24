@@ -5,6 +5,8 @@ using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit;
 using NUnit.Framework;
 using System.Collections.Generic;
+using Ubiq.Rooms;
+using Ubiq.Avatars;
 
 public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
 {
@@ -19,7 +21,7 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
     public SphereCollider boxCollider; // Implements actual collisions
 
     public float expansionDuration = 5f;
-    public float expansionSize = 10f;
+    public float expansionSize = 20f;
     private float timer = 0f;
 
     private bool smashed = false;
@@ -39,6 +41,9 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
     private bool owner = false;
 
     private TextureMixer textureMixer;
+
+    private RoomClient roomClient;
+    private AvatarManager avatarManager;
 
     public struct Accessories
     {
@@ -60,6 +65,21 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
 
     void Awake()
     {
+        var networkScene = NetworkScene.Find(this);
+        if (networkScene != null)
+        {
+            roomClient = networkScene.GetComponentInChildren<RoomClient>();
+            avatarManager = networkScene.GetComponentInChildren<AvatarManager>();
+        }
+        if (roomClient == null)
+        {
+            Debug.Log("Couldnt set RoomClient for AccessoryPotion");
+        }
+        if (avatarManager == null)
+        {
+            Debug.Log("Couldnt set AvatarManager for AccessoryPotion");
+        }
+
         textureMixer = TextureMixer.Instance;
         if (textureMixer == null)
         {
@@ -197,7 +217,7 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             Debug.Log($"OnTriggerEnter called by collider: {other.gameObject.name}");
             Ubiq.Avatars.Avatar avatar = other.GetComponentInParent<Ubiq.Avatars.Avatar>();
 
-            if (avatar != null && !affectedAvatars.Contains(avatar.name))
+            if (avatar != null && avatar == avatarManager.FindAvatar(roomClient.Me) && !affectedAvatars.Contains(avatar.name))
             {
                 Debug.Log("Potion touched avatar " + avatar.name);
 
@@ -215,6 +235,7 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
                 }
                 if (!string.IsNullOrEmpty(accessories.textureBlob))
                 {
+                    Debug.Log("blob: " + accessories.textureBlob);
                     Debug.Log("Applying texture to " + avatar.name);
                     Texture2D avatarTexture = textureMixer.Base64ToTexture2D(accessories.textureBlob);
                     TexturedAvatar texturedAvatar = avatar.GetComponent<TexturedAvatar>();
@@ -235,6 +256,8 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
         if (rigidBody != null)
         {
             rigidBody.isKinematic = true;
+            rigidBody.useGravity = true;
+            rigidBody.detectCollisions = true;
         }
 
         MeshRenderer renderer = GetComponent<MeshRenderer>();
@@ -260,6 +283,7 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
         collisionsEnabled = false;
 
         triggerCollider.radius = initialSize * expansionSize;
+        rigidBody.WakeUp();
 
         //
         context.SendJson(new TransformMessage

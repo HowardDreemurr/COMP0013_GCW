@@ -162,5 +162,5 @@ MonoBehaviour:
   triggerCollider: {fileID: -3305585094903194392}
   boxCollider: {fileID: 3926908910438426965}
   expansionDuration: 5
-  expansionSize: 10
+  expansionSize: 20
   destroyed: 0
