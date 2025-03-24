@@ -51,6 +51,15 @@ public class FakeAvatarHead : MonoBehaviour, INetworkSpawnable
 
         // Set our own one
         avatarTexture = texture;
+    }
+
+    public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
+    {
+        var msg = message.FromJson<FakeAvatarHeadMessage>();
+        if (textureMixer != null)
+        {
+            avatarTexture = textureMixer.Base64ToTexture2D(msg.blob);
+        }
 
         // Also set it on the renderer
         if (cachedRenderer != null)
@@ -61,14 +70,15 @@ public class FakeAvatarHead : MonoBehaviour, INetworkSpawnable
         {
             Debug.LogWarning("No Renderer found during syncState");
         }
-    }
 
-    public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
-    {
-        var msg = message.FromJson<FakeAvatarHeadMessage>();
-        if (textureMixer != null)
+        // Also set it on the renderer
+        if (cachedRenderer != null)
         {
-            avatarTexture = textureMixer.Base64ToTexture2D(msg.blob);
+            cachedRenderer.material.mainTexture = avatarTexture;
+        }
+        else
+        {
+            Debug.LogWarning("No Renderer found during syncState");
         }
     }
 }
