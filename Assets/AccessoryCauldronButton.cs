@@ -103,6 +103,7 @@ public class AccessoryCauldronButton : MonoBehaviour
             accessoryPotion.accessories.neck = accessoryPotionMaker.accessories.neck;
             accessoryPotion.accessories.back = accessoryPotionMaker.accessories.back;
             accessoryPotion.accessories.face = accessoryPotionMaker.accessories.face;
+            accessoryPotion.accessories.textureBlob = accessoryPotionMaker.accessories.textureBlob;
             potions.Add(accessoryPotion);
             StartCoroutine(syncPotionState(accessoryPotion));
 

@@ -70,15 +70,5 @@ public class FakeAvatarHead : MonoBehaviour, INetworkSpawnable
         {
             Debug.LogWarning("No Renderer found during syncState");
         }
-
-        // Also set it on the renderer
-        if (cachedRenderer != null)
-        {
-            cachedRenderer.material.mainTexture = avatarTexture;
-        }
-        else
-        {
-            Debug.LogWarning("No Renderer found during syncState");
-        }
     }
 }

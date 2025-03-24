@@ -12,7 +12,7 @@ using System.Collections;
 public class RemoteAvatarInteractableAttacher : MonoBehaviour
 {
     private AvatarManager avatarManager;
-    private NetworkSpawner spawner;
+    public NetworkSpawner spawner;
     public PrefabCatalogue avatarCatalogue; // This will just contain Floating Avatar
     public RoomClient RoomClient { get; private set; }
 

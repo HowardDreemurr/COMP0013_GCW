@@ -7,10 +7,11 @@ public class AccessoryPotionMaker : MonoBehaviour
     public BoxCollider triggerCollider;
 
     [SerializeField] private AccessoryManager accessoryManager;
-    private float timer = 0f;
-    private float logInterval = 1f;
+    [SerializeField] private RemoteAvatarInteractableAttacher remoteAvatarInteractableAttacher;
     private NetworkContext context;
+    private TextureMixer textureMixer;
 
+    public int operationNumber;
     public GameObject ParticlePrefab;
     public GameObject AudioPrefab;
 
@@ -20,9 +21,20 @@ public class AccessoryPotionMaker : MonoBehaviour
         public int neck;
         public int back;
         public int face;
+        public string textureBlob;
     }
 
     public Accessories accessories;
+
+    private void Awake()
+    {
+        textureMixer = TextureMixer.Instance;
+        if (textureMixer == null)
+        {
+            // We could just set this in the inspector if there's issues
+            Debug.LogWarning("Couldnt bind TextureMixer to AccessoryPotionMaker");
+        }
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -42,6 +54,7 @@ public class AccessoryPotionMaker : MonoBehaviour
         accessories.neck = -1;
         accessories.back = -1;
         accessories.face = -1;
+        accessories.textureBlob = null; // NOTE: Do not try sending a message containing a null field, just send "" instead
     }
 
     // Update is called once per frame
@@ -53,6 +66,7 @@ public class AccessoryPotionMaker : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         HatNetworkedObject hat = other.GetComponentInParent<HatNetworkedObject>();
+        FakeAvatarHead head = other.GetComponentInParent<FakeAvatarHead>();
         
         if (hat != null)
         {
@@ -83,7 +97,28 @@ public class AccessoryPotionMaker : MonoBehaviour
                 head = accessories.head,
                 neck = accessories.neck,
                 back = accessories.back,
-                face = accessories.face
+                face = accessories.face,
+                textureBlob = accessories.textureBlob == null ? "" : accessories.textureBlob
+            });
+
+            SpawnEffects(ParticlePrefab, transform.position);
+            SpawnEffects(AudioPrefab, transform.position);
+        }
+        else if (head != null)
+        {
+            Debug.Log("Adding texture ingredient...");
+            Texture2D fakeAvatarTexture = head.avatarTexture;
+            accessories.textureBlob = textureMixer.AddIngradient(operationNumber, fakeAvatarTexture, accessories.textureBlob);
+            remoteAvatarInteractableAttacher.spawner.Despawn(head.gameObject);
+            operationNumber++;
+
+            context.SendJson(new Accessories
+            {
+                head = accessories.head,
+                neck = accessories.neck,
+                back = accessories.back,
+                face = accessories.face,
+                textureBlob = accessories.textureBlob == null ? "" : accessories.textureBlob
             });
 
             SpawnEffects(ParticlePrefab, transform.position);
@@ -99,6 +134,10 @@ public class AccessoryPotionMaker : MonoBehaviour
         accessories.neck = msg.neck;
         accessories.back = msg.back;
         accessories.face = msg.face;
+        if (!string.IsNullOrEmpty(msg.textureBlob))
+        {
+            accessories.textureBlob = msg.textureBlob;
+        }
 
         Debug.Log("Head: " + accessories.head + " Neck: " + accessories.neck + " Back: " + accessories.back + " Face: " + accessories.face);
     }

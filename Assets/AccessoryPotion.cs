@@ -38,12 +38,15 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
 
     private bool owner = false;
 
+    private TextureMixer textureMixer;
+
     public struct Accessories
     {
         public int head;
         public int neck;
         public int back;
         public int face;
+        public string textureBlob;
     }
 
     public Accessories accessories;
@@ -57,6 +60,12 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
 
     void Awake()
     {
+        textureMixer = TextureMixer.Instance;
+        if (textureMixer == null)
+        {
+            Debug.LogWarning("Couldnt bind TextureMixer to AccessoryPotion");
+        }
+
         rigidBody = GetComponent<Rigidbody>();
         if (rigidBody == null)
         {
@@ -140,7 +149,8 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
                     headIdx = -2,
                     neckIdx = -2,
                     backIdx = -2,
-                    faceIdx = -2
+                    faceIdx = -2,
+                    textureBlob = ""
                 });
             }
         }
@@ -203,6 +213,13 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
                 {
                     accessoryManager.AttachHatOnSpawn(accessories.face, avatar, AccessorySlot.Face);
                 }
+                if (!string.IsNullOrEmpty(accessories.textureBlob))
+                {
+                    Debug.Log("Applying texture to " + avatar.name);
+                    Texture2D avatarTexture = textureMixer.Base64ToTexture2D(accessories.textureBlob);
+                    TexturedAvatar texturedAvatar = avatar.GetComponent<TexturedAvatar>();
+                    texturedAvatar.SetCustomTexture(avatarTexture);
+                }
 
                 affectedAvatars.Add(avatar.name); // don't apply to this avatar again or else it just freezes the game
             }
@@ -254,7 +271,8 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             headIdx = -2,
             neckIdx = -2,
             backIdx = -2,
-            faceIdx = -2
+            faceIdx = -2,
+            textureBlob = ""
         });
 
         SpawnEffects(ParticlePrefab, transform.position);
@@ -277,10 +295,11 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
         public Quaternion rotation;
         public bool smashed;
         public CollisionState collisions;
-        public int headIdx; // -2 => no change, -1 => no accessory, >=0 => accessory idx
+        public int headIdx; // -2 => no change, -1 => no accessory
         public int neckIdx;
         public int backIdx;
         public int faceIdx;
+        public string textureBlob; // "" => no texture (DO NOT SEND NULL)
     }
 
     public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
@@ -327,6 +346,10 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
         {
             accessories.face = msg.faceIdx;
         }
+        if (!string.IsNullOrEmpty(msg.textureBlob))
+        {
+            accessories.textureBlob = msg.textureBlob;
+        }
     }
 
     public void DisablePhysics()
@@ -350,7 +373,8 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             headIdx = -2,
             neckIdx = -2,
             backIdx = -2,
-            faceIdx = -2
+            faceIdx = -2,
+            textureBlob = ""
         });
     }
 
@@ -375,7 +399,8 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             headIdx = -2,
             neckIdx = -2,
             backIdx = -2,
-            faceIdx = -2
+            faceIdx = -2,
+            textureBlob = ""
         });
     }
 
@@ -392,7 +417,8 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             headIdx = accessories.head,
             neckIdx = accessories.neck,
             backIdx = accessories.back,
-            faceIdx = accessories.face
+            faceIdx = accessories.face,
+            textureBlob = ""
         });
     }
 
