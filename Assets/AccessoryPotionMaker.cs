@@ -1,6 +1,7 @@
 using UnityEngine;
 using Ubiq.Spawning;
 using Ubiq.Messaging;
+using System.Collections.Generic;
 
 public class AccessoryPotionMaker : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class AccessoryPotionMaker : MonoBehaviour
     [SerializeField] private RemoteAvatarInteractableAttacher remoteAvatarInteractableAttacher;
     private NetworkContext context;
     private TextureMixer textureMixer;
+    private HashSet<int> usedHeads = new HashSet<int>();
 
     public int operationNumber;
     public GameObject ParticlePrefab;
@@ -107,6 +109,15 @@ public class AccessoryPotionMaker : MonoBehaviour
         else if (head != null)
         {
             Debug.Log("Adding texture ingredient...");
+
+            int headID = head.GetInstanceID();
+            if (usedHeads.Contains(headID))
+            {
+                // Already processed this head
+                return;
+            }
+            usedHeads.Add(headID);
+
             Texture2D fakeAvatarTexture = head.avatarTexture;
             accessories.textureBlob = textureMixer.AddIngradient(operationNumber, fakeAvatarTexture, accessories.textureBlob);
             remoteAvatarInteractableAttacher.spawner.Despawn(head.gameObject);
