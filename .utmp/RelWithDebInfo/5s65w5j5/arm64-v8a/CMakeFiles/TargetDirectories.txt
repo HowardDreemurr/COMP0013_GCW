@@ -1,0 +1,5 @@
+C:/git-repo/COMP0013_GCW/.utmp/RelWithDebInfo/5s65w5j5/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/git-repo/COMP0013_GCW/.utmp/RelWithDebInfo/5s65w5j5/arm64-v8a/CMakeFiles/rebuild_cache.dir
+C:/git-repo/COMP0013_GCW/.utmp/RelWithDebInfo/5s65w5j5/arm64-v8a/GameActivity/CMakeFiles/game.dir
+C:/git-repo/COMP0013_GCW/.utmp/RelWithDebInfo/5s65w5j5/arm64-v8a/GameActivity/CMakeFiles/edit_cache.dir
+C:/git-repo/COMP0013_GCW/.utmp/RelWithDebInfo/5s65w5j5/arm64-v8a/GameActivity/CMakeFiles/rebuild_cache.dir

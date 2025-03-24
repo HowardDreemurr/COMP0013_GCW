@@ -1,0 +1,2 @@
+C:\git-repo\COMP0013_GCW\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\CMakeLists.txt
+C:\git-repo\COMP0013_GCW\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\src\main\cpp\GameActivity\CMakeLists.txt

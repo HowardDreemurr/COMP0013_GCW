@@ -13,6 +13,10 @@ public class AutoDestoryAudios : MonoBehaviour, INetworkSpawnable
 
     void Start()
     {
+        if (NetworkId)
+        {
+            context = NetworkScene.Register(this);
+        }
         context = NetworkScene.Register(this);
         audios = GetComponentInChildren<AudioSource>();
         lastPosition = transform.position;
@@ -21,11 +25,14 @@ public class AutoDestoryAudios : MonoBehaviour, INetworkSpawnable
 
     private void Update()
     {
+        if (NetworkId && context.Equals(default(NetworkContext)))
+        {
+            context = NetworkScene.Register(this);
+        }
         if (!boardcasted)
         {
             if ((transform.position - Vector3.zero).sqrMagnitude > 0.1f)
             {
-                Debug.Log("Trigger!");
                 audios.Play();
                 Invoke(nameof(SendTransformMessage), 0.2f);
 

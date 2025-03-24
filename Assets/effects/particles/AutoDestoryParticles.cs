@@ -14,7 +14,10 @@ public class AutoDestroyParticles : MonoBehaviour, INetworkSpawnable
 
     private void Start()
     {
-        context = NetworkScene.Register(this);
+        if (NetworkId)
+        {
+            context = NetworkScene.Register(this);
+        }
         particles = GetComponentInChildren<ParticleSystem>();
         lastPosition = transform.position;
         lastRotation = transform.rotation;
@@ -23,6 +26,10 @@ public class AutoDestroyParticles : MonoBehaviour, INetworkSpawnable
 
     private void Update()
     {
+        if (NetworkId && context.Equals(default(NetworkContext)))
+        {
+            context = NetworkScene.Register(this);
+        }
         if (!boardcasted)
         {
             if ((transform.position - Vector3.zero).sqrMagnitude > 0.1f)

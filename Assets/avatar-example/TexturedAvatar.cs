@@ -17,8 +17,8 @@ public class TexturedAvatar : MonoBehaviour
     public AvatarTextureCatalogue Textures;
     public bool RandomTextureOnSpawn;
     public bool SaveTextureSetting;
-    public GameObject CatalogueChangeParticles;
-    public GameObject CustomChangeParticles;
+    public GameObject Particles;
+    public GameObject Audio;
 
     [Serializable]
     public class TextureEvent : UnityEvent<Texture2D> { }
@@ -129,7 +129,8 @@ public class TexturedAvatar : MonoBehaviour
             if (avatar.IsLocal)
             {
                 roomClient.Me["ubiq.avatar.texture.blob"] = blob;
-                SpawnChangeParticles(CustomChangeParticles);
+                SpawnEffects(Particles);
+                SpawnEffects(Audio);
             }
 
             if (avatar.IsLocal && SaveTextureSetting)
@@ -172,7 +173,8 @@ public class TexturedAvatar : MonoBehaviour
                 roomClient.Me["ubiq.avatar.texture.blob"] = null;
                 roomClient.Me["ubiq.avatar.texture.uuid"] = this.uuid;
 
-                SpawnChangeParticles(CatalogueChangeParticles);
+                SpawnEffects(Particles);
+                SpawnEffects(Audio);
             }
 
             if (avatar.IsLocal && SaveTextureSetting)
@@ -229,7 +231,7 @@ public class TexturedAvatar : MonoBehaviour
         return base64;
     }
 
-    private void SpawnChangeParticles(GameObject particlePrefab)
+    private void SpawnEffects(GameObject particlePrefab)
     {
         if (particlePrefab)
         {

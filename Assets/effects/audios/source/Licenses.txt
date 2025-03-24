@@ -2,6 +2,10 @@ glass-break.wav by datasoundsample -- https://freesound.org/s/41348/ -- License:
 
 clock-ticking.wav by lukaso -- https://freesound.org/s/69721/ -- License: Sampling+
 
-water-gulp by qubodup -- https://freesound.org/s/792933/ -- License: Creative Commons 0
+water-gulp.wav by qubodup -- https://freesound.org/s/792933/ -- License: Creative Commons 0
 
 scify-shutdown.wav by MATRIXXX_ -- https://freesound.org/s/523553/ -- License: Creative Commons 0
+
+drop-cloth.wav by zembacraftworks -- https://freesound.org/s/428336/ -- License: Creative Commons 0
+
+Whoosh.wav by Speedenza -- https://freesound.org/s/168180/ -- License: Attribution NonCommercial 4.0
