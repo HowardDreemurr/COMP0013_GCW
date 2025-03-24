@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &3411698034824812118
+--- !u!1001 &8652327162868093385
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -50,7 +50,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 7c534830f891cc6478556f53dd1dd237, type: 3}
       propertyPath: m_Name
-      value: potion
+      value: Potion
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -58,29 +58,29 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7c534830f891cc6478556f53dd1dd237, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5977634508240162364}
+      addedObject: {fileID: 4337089309866313176}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7c534830f891cc6478556f53dd1dd237, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3926908910438426965}
+      addedObject: {fileID: -9207130081935285158}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7c534830f891cc6478556f53dd1dd237, type: 3}
       insertIndex: -1
-      addedObject: {fileID: -3305585094903194392}
+      addedObject: {fileID: 8235542812953956784}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7c534830f891cc6478556f53dd1dd237, type: 3}
       insertIndex: -1
-      addedObject: {fileID: -710605518879108288}
+      addedObject: {fileID: -4821178987592569088}
   m_SourcePrefab: {fileID: 100100000, guid: 7c534830f891cc6478556f53dd1dd237, type: 3}
---- !u!1 &2565258039652035335 stripped
+--- !u!1 &8417883457203104920 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 7c534830f891cc6478556f53dd1dd237, type: 3}
-  m_PrefabInstance: {fileID: 3411698034824812118}
+  m_PrefabInstance: {fileID: 8652327162868093385}
   m_PrefabAsset: {fileID: 0}
---- !u!54 &5977634508240162364
+--- !u!54 &4337089309866313176
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2565258039652035335}
+  m_GameObject: {fileID: 8417883457203104920}
   serializedVersion: 4
   m_Mass: 1
   m_Drag: 0
@@ -101,13 +101,13 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!135 &3926908910438426965
+--- !u!135 &-9207130081935285158
 SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2565258039652035335}
+  m_GameObject: {fileID: 8417883457203104920}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -122,13 +122,13 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.15
   m_Center: {x: 0, y: 0, z: 0}
---- !u!135 &-3305585094903194392
+--- !u!135 &8235542812953956784
 SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2565258039652035335}
+  m_GameObject: {fileID: 8417883457203104920}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -143,24 +143,24 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.2
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &-710605518879108288
+--- !u!114 &-4821178987592569088
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2565258039652035335}
+  m_GameObject: {fileID: 8417883457203104920}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea9fb6a8c25c68c43ba752c92453c5d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ParticlePrefab: {fileID: 8041105477772115659, guid: d3ccd44c78b549343b919e20ce751336, type: 3}
+  ParticlePrefab: {fileID: 7718508408663989101, guid: 75593e5ece3b89d4bbac24a0c71ecf74, type: 3}
   AudioPrefab: {fileID: 8529788867650411095, guid: 80fa2bd7cc8acbf4abef7349941207bd, type: 3}
   collisionsEnabled: 0
   rigidBody: {fileID: 0}
-  triggerCollider: {fileID: -3305585094903194392}
-  boxCollider: {fileID: 3926908910438426965}
+  triggerCollider: {fileID: 8235542812953956784}
+  boxCollider: {fileID: -9207130081935285158}
   expansionDuration: 5
-  expansionSize: 20
+  expansionSize: 10
   destroyed: 0
