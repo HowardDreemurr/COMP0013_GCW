@@ -93,7 +93,7 @@ public class AccessoryCauldronButton : MonoBehaviour
 
         GameObject potionPrefab = potionCatalogue.prefabs[0];
         GameObject potion = potionSpawner.SpawnWithPeerScope(potionPrefab);
-        potion.transform.localPosition = accessoryPotionMaker.transform.localPosition + new Vector3(0, 2, 0);
+        potion.transform.localPosition = accessoryPotionMaker.transform.localPosition + new Vector3(0, 1, 0);
         potion.transform.localRotation = Quaternion.identity;
 
         AccessoryPotion accessoryPotion = potion.GetComponent<AccessoryPotion>();

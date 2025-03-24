@@ -191,9 +191,18 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             {
                 Debug.Log("Potion touched avatar " + avatar.name);
 
-                accessoryManager.AttachHatOnSpawn(accessories.head, avatar, AccessorySlot.Head);
-                accessoryManager.AttachHatOnSpawn(accessories.back, avatar, AccessorySlot.Back);
-                accessoryManager.AttachHatOnSpawn(accessories.face, avatar, AccessorySlot.Face);
+                if (accessories.head > -1)
+                {
+                    accessoryManager.AttachHatOnSpawn(accessories.head, avatar, AccessorySlot.Head);
+                }
+                if (accessories.back > -1)
+                {
+                    accessoryManager.AttachHatOnSpawn(accessories.back, avatar, AccessorySlot.Back);
+                }
+                if (accessories.face > -1)
+                {
+                    accessoryManager.AttachHatOnSpawn(accessories.face, avatar, AccessorySlot.Face);
+                }
 
                 affectedAvatars.Add(avatar.name); // don't apply to this avatar again or else it just freezes the game
             }
