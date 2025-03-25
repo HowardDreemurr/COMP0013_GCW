@@ -9,8 +9,8 @@ public class AccessoryPotionMaker : MonoBehaviour
 
     [SerializeField] private AccessoryManager accessoryManager;
     [SerializeField] private RemoteAvatarInteractableAttacher remoteAvatarInteractableAttacher;
+    [SerializeField] private TextureMixer textureMixer;
     private NetworkContext context;
-    private TextureMixer textureMixer;
     private HashSet<int> usedHeads = new HashSet<int>();
 
     public int operationNumber;
@@ -30,12 +30,7 @@ public class AccessoryPotionMaker : MonoBehaviour
 
     private void Awake()
     {
-        textureMixer = TextureMixer.Instance;
-        if (textureMixer == null)
-        {
-            // We could just set this in the inspector if there's issues
-            Debug.LogWarning("Couldnt bind TextureMixer to AccessoryPotionMaker");
-        }
+
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -110,10 +105,34 @@ public class AccessoryPotionMaker : MonoBehaviour
             usedHeads.Add(headID);
 
             Texture2D fakeAvatarTexture = head.avatarTexture;
+            if (fakeAvatarTexture == null)
+            {
+                Debug.LogWarning("fakeAvatarTexture == null");
+            }
+            if (accessories.textureBlob == null)
+            {
+                Debug.LogWarning("accessories.textureBlob == null (before calling AddIngradient)");
+            }
+            if (textureMixer == null)
+            {
+                // THIS PRINTS
+                Debug.LogWarning("textureMixer == null (before calling AddIngradient");
+            }
+
+            Debug.Log("Calling textureMixer.AddIngradient (AccessoryPotionMaker.OnTriggerEnter)");
             accessories.textureBlob = textureMixer.AddIngradient(operationNumber, fakeAvatarTexture, accessories.textureBlob);
+            Debug.Log("Leaving textureMixer.AddIngradient (AccessoryPotionMaker.OnTriggerEnter)");
+
+            if (accessories.textureBlob == null)
+            {
+                Debug.LogWarning("accessories.textureBlob == null (after calling AddIngradient)");
+            }
+
+            Debug.Log("Destroying head.gameObject");
             Destroy(head.gameObject);
             operationNumber++;
 
+            Debug.Log("Sending updated cauldron state to peers");
             context.SendJson(new Accessories
             {
                 head = accessories.head,
@@ -123,6 +142,7 @@ public class AccessoryPotionMaker : MonoBehaviour
                 textureBlob = accessories.textureBlob == null ? "" : accessories.textureBlob
             });
 
+            Debug.Log("Spawning particles");
             SpawnEffects(ParticlePrefab, transform.position);
             SpawnEffects(AudioPrefab, transform.position);
         }

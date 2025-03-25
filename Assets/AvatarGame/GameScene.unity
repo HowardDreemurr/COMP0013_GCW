@@ -2134,6 +2134,17 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 947274156}
   m_SourcePrefab: {fileID: 100100000, guid: 76f3439a0ae796e4b81bee3f91f888ee, type: 3}
+--- !u!114 &1027240809 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7249347820323406291, guid: e52a1368da396ce4eb7cfdd3727f0ba4, type: 3}
+  m_PrefabInstance: {fileID: 614892897}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e30d1ba79e6cb64fa56afeaaed1d498, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1027946948
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5256,6 +5267,7 @@ MonoBehaviour:
   triggerCollider: {fileID: 0}
   accessoryManager: {fileID: 1816713889}
   remoteAvatarInteractableAttacher: {fileID: 1443208750}
+  textureMixer: {fileID: 1027240809}
   operationNumber: 0
   ParticlePrefab: {fileID: 8041105477772115659, guid: d3ccd44c78b549343b919e20ce751336, type: 3}
   AudioPrefab: {fileID: 3171707044500767054, guid: 55382ec3869c0bd4a888f03120268180, type: 3}
@@ -8001,27 +8013,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6806867407171974117, guid: 73369a530bd8253469d623a3ea6dcff9, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6806867407171974117, guid: 73369a530bd8253469d623a3ea6dcff9, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6806867407171974117, guid: 73369a530bd8253469d623a3ea6dcff9, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 30
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6806867407171974117, guid: 73369a530bd8253469d623a3ea6dcff9, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 40
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6806867407171974117, guid: 73369a530bd8253469d623a3ea6dcff9, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 21
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6806867407171974117, guid: 73369a530bd8253469d623a3ea6dcff9, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -22.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6838063483354157155, guid: 73369a530bd8253469d623a3ea6dcff9, type: 3}
       propertyPath: m_Layer
