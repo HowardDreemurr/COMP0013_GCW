@@ -125,6 +125,7 @@ public class RemoteAvatarInteractableAttacher : MonoBehaviour
 
         Debug.Log("\tSpawning fake avatar");
         var fakeAvatar = spawner.SpawnWithPeerScope(avatarCatalogue.prefabs[0]);
+        fakeAvatar.transform.localPosition += new Vector3(-4.5f, 3.0f, -0.25f);
 
         Renderer renderer = fakeAvatar.GetComponentInChildren<Renderer>();
         if (renderer != null)
