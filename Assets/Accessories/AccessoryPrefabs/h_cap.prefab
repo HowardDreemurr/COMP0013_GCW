@@ -83,4 +83,4 @@ MonoBehaviour:
   triggerCollider: {fileID: 0}
   idx: 0
   slot: 0
-  AudioPrefab: {fileID: 0}
+  AudioPrefab: {fileID: 5351696746413860095, guid: 34080893cef5d6848aee890b0761dd21, type: 3}
