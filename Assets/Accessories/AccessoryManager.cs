@@ -134,10 +134,9 @@ public class AccessoryManager : MonoBehaviour
         HatNetworkedObject hatNetworkedObject = hat.GetComponent<HatNetworkedObject>();
         if (hatNetworkedObject != null)
         {
-            hatNetworkedObject.accessoryManager = this;
             hatNetworkedObject.collisionsEnabled = false;
-            hatNetworkedObject.AttachHat(avatar, arg_slot);
             hatNetworkedObject.idx = idx;
+            hatNetworkedObject.AttachHat(avatar, arg_slot);
         }
         else
         {
@@ -195,7 +194,6 @@ public class AccessoryManager : MonoBehaviour
         HatNetworkedObject hatNetworkedObject = accessory.GetComponent<HatNetworkedObject>();
         if (hatNetworkedObject != null)
         {
-            hatNetworkedObject.accessoryManager = this;
             hatNetworkedObject.collisionsEnabled = true;
             hatNetworkedObject.idx = idx;
             StartCoroutine(syncIdxExternal(hatNetworkedObject, idx));
@@ -255,7 +253,6 @@ public class AccessoryManager : MonoBehaviour
         HatNetworkedObject hatNetworkedObject = accessory.GetComponent<HatNetworkedObject>();
         if (hatNetworkedObject != null)
         {
-            hatNetworkedObject.accessoryManager = this;
             hatNetworkedObject.collisionsEnabled = collisions;
             hatNetworkedObject.idx = idx;
             StartCoroutine(syncIdxExternal(hatNetworkedObject, idx));

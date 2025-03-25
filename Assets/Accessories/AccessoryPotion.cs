@@ -28,7 +28,7 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
     private bool expanding = false;
     public bool destroyed = false;
 
-    private List<string> affectedAvatars = new List<string>();
+    private bool appliedToSelf = false;
 
     private float initialSize;
 
@@ -115,7 +115,7 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
         }
         grab.selectEntered.AddListener((SelectEnterEventArgs args) =>
         {
-            Debug.Log("(Potion) Grabed");
+            Debug.Log("(Potion) Grabbed");
             DisablePhysics();
             owner = true;
         });
@@ -200,7 +200,7 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             return;
         }
 
-        if (collisionsEnabled)
+        if (collisionsEnabled && !expanding)
         {
             float velocity = rigidBody.linearVelocity.magnitude;
 
@@ -217,7 +217,7 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             Debug.Log($"OnTriggerEnter called by collider: {other.gameObject.name}");
             Ubiq.Avatars.Avatar avatar = other.GetComponentInParent<Ubiq.Avatars.Avatar>();
 
-            if (avatar != null && avatar == avatarManager.FindAvatar(roomClient.Me) && !affectedAvatars.Contains(avatar.name))
+            if (avatar != null && avatar == avatarManager.FindAvatar(roomClient.Me) && !appliedToSelf)
             {
                 Debug.Log("Potion touched avatar " + avatar.name);
 
@@ -242,7 +242,7 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
                     texturedAvatar.SetCustomTexture(avatarTexture);
                 }
 
-                affectedAvatars.Add(avatar.name); // don't apply to this avatar again or else it just freezes the game
+                appliedToSelf = true; // don't apply to this avatar again or else it just freezes the game
             }
         }
     }

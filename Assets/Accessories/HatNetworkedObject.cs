@@ -17,7 +17,7 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
     public Rigidbody rb;
     public BoxCollider bc;
     public BoxCollider triggerCollider;
-    public AccessoryManager accessoryManager; // This is the accessoryManager that spawned this 'hat'
+    private AccessoryManager accessoryManager; // This is the accessoryManager that spawned this 'hat'
     public int idx;
 
     public AccessorySlot slot;
@@ -55,6 +55,14 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
         // Store the initial transform values when the GameObject is first instantiated
         initTranslation = transform.position;
         initRotation = transform.rotation;
+
+        // Retrieve the singleton AccessoryManager (idk if it's actually a singleton but it's design-time and there's only one)
+        accessoryManager = FindFirstObjectByType<AccessoryManager>();
+        if (accessoryManager == null)
+        {
+            Debug.LogWarning("Local AccessoryManager not found in the scene");
+            return;
+        }
 
         // Add or retrieve the Rigidbody
         rb = GetComponent<Rigidbody>();
@@ -201,29 +209,21 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
             return;
         }
 
-        // Retrieve the singleton AccessoryManager (idk if it's actually a singleton but it's design-time and there's only one)
-        AccessoryManager localAccessoryManager = FindFirstObjectByType<AccessoryManager>();
-        if (localAccessoryManager == null)
-        {
-            Debug.LogWarning("Local AccessoryManager not found in the scene");
-            return;
-        }
-
         // Choose the correct spawner based on the accessory slot
         NetworkSpawner spawner = null;
         switch (arg_slot)
         {
             case AccessorySlot.Head:
-                spawner = localAccessoryManager.headSpawner;
+                spawner = accessoryManager.headSpawner;
                 break;
             case AccessorySlot.Neck:
-                spawner = localAccessoryManager.neckSpawner;
+                spawner = accessoryManager.neckSpawner;
                 break;
             case AccessorySlot.Back:
-                spawner = localAccessoryManager.backSpawner;
+                spawner = accessoryManager.backSpawner;
                 break;
             case AccessorySlot.Face:
-                spawner = localAccessoryManager.faceSpawner;
+                spawner = accessoryManager.faceSpawner;
                 break;
         }
 
@@ -270,7 +270,7 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
             lastRotation = transform.rotation;
         }
 
-        if (msg.collisions == CollisionState.Enabled && !collisionsEnabled)
+        if (msg.collisions == CollisionState.Enabled && !collisionsEnabled && !isParented)
         {
             EnablePhysics();
             physicsOwner = false;
