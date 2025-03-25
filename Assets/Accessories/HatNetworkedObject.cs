@@ -106,13 +106,13 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
         grab.selectEntered.AddListener((SelectEnterEventArgs args) =>
         {
             Debug.Log("Hat was selected!");
-            DisablePhysics(null);
+            DisablePhysics(null, true);
             physicsOwner = true;
         });
         grab.selectExited.AddListener((SelectExitEventArgs args) =>
         {
             Debug.Log("Hat was dropped!");
-            EnablePhysics();
+            EnablePhysics(true);
             physicsOwner = false;
         });
 
@@ -133,7 +133,7 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
         // Let's tell everyone else, since they spawned the hat through a different code path (NetworkSpawner) that won't mirror this
         if (collisionsEnabled)
         {
-            EnablePhysics();
+            EnablePhysics(true);
             physicsOwner = true;
         }
 
@@ -256,7 +256,7 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
         // Extract UUID from avatar name
         string[] parts = avatar.name.Split(' ');
         string parentAvatarId = parts[parts.Length - 1];
-        DisablePhysics(parentAvatarId);
+        DisablePhysics(parentAvatarId, true);
         isParented = true;
 
         if (avatar == avatarManager.FindAvatar(roomClient.Me) && arg_slot != AccessorySlot.Back)
@@ -360,12 +360,12 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
 
         if (msg.collisions == CollisionState.Enabled && !collisionsEnabled && !isParented)
         {
-            EnablePhysics();
+            EnablePhysics(false);
             physicsOwner = false;
         }
         else if (msg.collisions == CollisionState.Disabled && collisionsEnabled)
         {
-            DisablePhysics(null);
+            DisablePhysics(null, false);
             physicsOwner = false;
         }
 
@@ -402,7 +402,7 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
         }
     }
 
-    public void DisablePhysics(string parentAvatarId)
+    public void DisablePhysics(string parentAvatarId, bool notify)
     {
         Debug.Log("Disabling Physics (parent = " + parentAvatarId + ")");
 
@@ -413,17 +413,20 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
             rb.detectCollisions = false;
         }
 
-        context.SendJson(new HatMessage
+        if (notify)
         {
-            position = transform.position,
-            rotation = transform.rotation,
-            collisions = CollisionState.Disabled,
-            parentNameOrId = parentAvatarId,
-            idx = -2
-        });
+            context.SendJson(new HatMessage
+            {
+                position = transform.position,
+                rotation = transform.rotation,
+                collisions = CollisionState.Disabled,
+                parentNameOrId = parentAvatarId,
+                idx = -2
+            });
+        }
     }
 
-    public void EnablePhysics()
+    public void EnablePhysics(bool notify)
     {
         Debug.Log("Enabling Physics");
 
@@ -434,14 +437,17 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
             rb.detectCollisions = true;
         }
 
-        context.SendJson(new HatMessage
+        if (notify)
         {
-            position = transform.position,
-            rotation = transform.rotation,
-            collisions = CollisionState.Enabled,
-            parentNameOrId = "", 
-            idx = -2
-        });
+            context.SendJson(new HatMessage
+            {
+                position = transform.position,
+                rotation = transform.rotation,
+                collisions = CollisionState.Enabled,
+                parentNameOrId = "",
+                idx = -2
+            });
+        }
     }
 
     private void SpawnEffects(GameObject prefab, Vector3 position)

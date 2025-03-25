@@ -200,7 +200,7 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             return;
         }
 
-        if (collisionsEnabled && !expanding)
+        if (collisionsEnabled && !smashed && !expanding)
         {
             float velocity = rigidBody.linearVelocity.magnitude;
 
@@ -251,6 +251,7 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
     {
         Debug.Log("Potion smashed");
 
+        expanding = true;
         owner = false;
 
         if (rigidBody != null)
@@ -269,7 +270,6 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
         if (triggerCollider != null)
         {
             initialSize = triggerCollider.radius;
-            expanding = true; // Start expansion
         }
 
         var grab = GetComponent<XRGrabInteractable>();
@@ -337,12 +337,12 @@ public class AccessoryPotion : MonoBehaviour, INetworkSpawnable
             lastPosition = transform.position;
             lastRotation = transform.rotation;
         }
-        if (msg.collisions == CollisionState.Enabled && !collisionsEnabled)
+        if (msg.collisions == CollisionState.Enabled && !collisionsEnabled && !expanding)
         {
             EnablePhysics();
             owner = false;
         }
-        else if (msg.collisions == CollisionState.Disabled && collisionsEnabled)
+        else if (msg.collisions == CollisionState.Disabled && collisionsEnabled && !expanding)
         {
             DisablePhysics();
             owner = false;
