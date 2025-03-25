@@ -123,6 +123,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: MirrorPrefabRoot
       objectReference: {fileID: 0}
+    - target: {fileID: 2975407375892437868, guid: 19a709978f5bcf34181dfeebd948853b, type: 3}
+      propertyPath: m_LocalScale.x
+      value: -0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 3861435456088045249, guid: 19a709978f5bcf34181dfeebd948853b, type: 3}
       propertyPath: m_CullingMask.m_Bits
       value: 21
