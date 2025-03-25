@@ -56,7 +56,7 @@ public class ChangeCostume : MonoBehaviour
         // prefab.
         StartCoroutine(SetRandomCostume());
     }
-    
+
     // This is a coroutine. They can be used in Unity to spread work out over 
     // multiple frames. They can be paused with a 'yield' instruction. When
     // the yield ends, they will pick up again wherever they left off.
@@ -66,31 +66,35 @@ public class ChangeCostume : MonoBehaviour
         {
             if (!avatarManager)
             {
-                // Yield break ends the coroutine.
                 yield break;
             }
-            
+
             var avatar = avatarManager.FindAvatar(roomClient.Me);
             if (avatar)
-            {    
+            {
                 var textured = avatar.GetComponentInChildren<TexturedAvatar>();
-                if (textured)
+                if (textured && textured.Textures.Count > 1)
                 {
-                    // Set the random texture.
-                    var randomCostume = textured.Textures.Get(
-                        Random.Range(0, textured.Textures.Count));
-                    textured.SetTexture(randomCostume);
-                    
-                    // End the coroutine.
+                    Texture2D current = textured.GetTexture();
+                    Texture2D randomTexture;
+
+                    // Keep looping while it is not the current skin
+                    do
+                    {
+                        randomTexture = textured.Textures.Get(
+                            Random.Range(0, textured.Textures.Count));
+                    }
+                    while (randomTexture == current);
+
+                    textured.SetTexture(randomTexture);
+
                     yield break;
                 }
             }
-            
-            // Yield return null pauses the coroutine until the next frame. We
-            // wait a few frames to allow the prefab to be spawned and to
-            // initialise itself.
+
             yield return null;
             yield return null;
         }
     }
+
 }

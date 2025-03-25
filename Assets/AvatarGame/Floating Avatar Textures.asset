@@ -13,8 +13,10 @@ MonoBehaviour:
   m_Name: Floating Avatar Textures
   m_EditorClassIdentifier: 
   Textures:
-  - {fileID: 2800000, guid: 01397368821347f43ab52f4a505b834f, type: 3}
-  - {fileID: 2800000, guid: 383d937aba841422ab27c75b7c192277, type: 3}
+  - {fileID: 2800000, guid: d9c54b5ff3a3d3842922c511fdb45f7d, type: 3}
+  - {fileID: 2800000, guid: d8e64a71e70806e4aa81fbfa2d9c23b6, type: 3}
   - {fileID: 2800000, guid: 6f6783b4949174cdaaa76e78de8919a2, type: 3}
-  - {fileID: 2800000, guid: 33ef49977808b4d73b64ea1e9fa13ed3, type: 3}
+  - {fileID: 2800000, guid: 53085229caa6d7b439a6bc6a75c32bc3, type: 3}
   - {fileID: 2800000, guid: 056ac369c01864c358b3407c58dff344, type: 3}
+  - {fileID: 2800000, guid: 33ef49977808b4d73b64ea1e9fa13ed3, type: 3}
+  - {fileID: 2800000, guid: 44b9dcd378716074cb7ae6433a14ef73, type: 3}
