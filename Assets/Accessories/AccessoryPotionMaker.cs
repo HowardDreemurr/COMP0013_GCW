@@ -156,9 +156,16 @@ public class AccessoryPotionMaker : MonoBehaviour
         accessories.neck = msg.neck;
         accessories.back = msg.back;
         accessories.face = msg.face;
-        if (!string.IsNullOrEmpty(msg.textureBlob))
+        if (!string.IsNullOrEmpty(msg.textureBlob)) // if blob=="" then just leave it as it is (i.e. 'do nothing' flag)
         {
-            accessories.textureBlob = msg.textureBlob;
+            if (msg.textureBlob == "x") // 'reset' flag
+            {
+                accessories.textureBlob = null;
+            }
+            else
+            {
+                accessories.textureBlob = msg.textureBlob;
+            }
         }
 
         Debug.Log("Head: " + accessories.head + " Neck: " + accessories.neck + " Back: " + accessories.back + " Face: " + accessories.face);
@@ -172,5 +179,24 @@ public class AccessoryPotionMaker : MonoBehaviour
 
             instance.transform.position = position;
         }
+    }
+
+    public void ResetState()
+    {
+        // Reset cauldron locally
+        accessories.head = -1;
+        accessories.neck = -1;
+        accessories.back = -1;
+        accessories.face = -1;
+        accessories.textureBlob = null; // NOTE: Do not try sending a message containing a null field, just send "" instead
+
+        context.SendJson(new Accessories
+        {
+            head = -1,
+            neck = -1,
+            back = -1,
+            face = -1,
+            textureBlob = "x" // this sucks but whatever 
+        });
     }
 }
