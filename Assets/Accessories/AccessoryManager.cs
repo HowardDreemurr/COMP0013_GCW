@@ -129,7 +129,7 @@ public class AccessoryManager : MonoBehaviour
 
     private IEnumerator attachHatExternal(GameObject hat, Ubiq.Avatars.Avatar avatar, AccessorySlot arg_slot, int idx)
     {
-        yield return new WaitForSeconds(0.2f); // Ubiq does not give me a way of telling if the hat has spawned for other users, it seems?
+        yield return new WaitForSeconds(0.5f); // Ubiq does not give me a way of telling if the hat has spawned for other users, it seems?
 
         HatNetworkedObject hatNetworkedObject = hat.GetComponent<HatNetworkedObject>();
         if (hatNetworkedObject != null)
