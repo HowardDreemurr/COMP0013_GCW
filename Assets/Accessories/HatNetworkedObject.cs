@@ -8,6 +8,8 @@ using UnityEngine.Windows;
 using static Ubiq.Avatars.AvatarInput;
 using UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets;
 using NUnit.Framework.Interfaces;
+using Ubiq.Avatars;
+using Ubiq.Rooms;
 
 // NB: This is called 'HatNetworkedObject' as a holdover, it can be thrown onto any accessory, not just hats
 public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
@@ -34,6 +36,9 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
     private bool physicsOwner;
     private bool isParented;
 
+    private RoomClient roomClient;
+    private AvatarManager avatarManager;
+
     private enum CollisionState
     {
         Unset,
@@ -52,6 +57,13 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
 
     void Awake()
     {
+        var networkScene = NetworkScene.Find(this);
+        if (networkScene != null)
+        {
+            roomClient = networkScene.GetComponentInChildren<RoomClient>();
+            avatarManager = networkScene.GetComponentInChildren<AvatarManager>();
+        }
+
         // Store the initial transform values when the GameObject is first instantiated
         initTranslation = transform.position;
         initRotation = transform.rotation;
@@ -247,9 +259,85 @@ public class HatNetworkedObject : MonoBehaviour, INetworkSpawnable
         DisablePhysics(parentAvatarId);
         isParented = true;
 
+        if (avatar == avatarManager.FindAvatar(roomClient.Me) && arg_slot != AccessorySlot.Back)
+        {
+            Debug.Log("Attempting to disable rendering of face-wear from local PoV...");
+
+            // Try to find the XR Rig
+            GameObject xrRig = GameObject.Find("XR Origin Hands (XR Rig)");
+            if (xrRig == null)
+            {
+                Debug.LogWarning("Could not find 'XR Origin Hands (XR Rig)' GameObject.");
+                return;
+            }
+
+            Debug.Log("Found XR Origin Hands (XR Rig)");
+
+            // Try to find the Camera Offset
+            Transform cameraOffset = xrRig.transform.Find("Camera Offset");
+            if (cameraOffset == null)
+            {
+                Debug.LogWarning("Could not find 'Camera Offset' child under XR Rig.");
+                return;
+            }
+
+            Debug.Log("Found Camera Offset");
+
+            // Try to find the Main Camera
+            Transform mainCameraTransform = cameraOffset.Find("Main Camera");
+            if (mainCameraTransform == null)
+            {
+                Debug.LogWarning("Could not find 'Main Camera' under Camera Offset.");
+                return;
+            }
+
+            Debug.Log("Found Main Camera");
+
+            Camera mainCamera = mainCameraTransform.GetComponent<Camera>();
+            if (mainCamera == null)
+            {
+                Debug.LogWarning("Main Camera GameObject found, but it doesn't have a Camera component.");
+                return;
+            }
+
+            Debug.Log("Main Camera component found");
+
+            // Assign to the special hidden layer
+            int hiddenLayer = LayerMask.NameToLayer("LocalOnlyHidden");
+            if (hiddenLayer == -1)
+            {
+                Debug.LogError("Layer 'LocalOnlyHidden' not found. Please add it under Project Settings > Tags and Layers.");
+                return;
+            }
+
+            Debug.Log("Setting layer to LocalOnlyHidden and updating camera culling mask");
+
+            SetLayerRecursively(gameObject, hiddenLayer);
+            mainCamera.cullingMask &= ~(1 << hiddenLayer); // Remove that layer from culling mask
+        }
+
+
         Debug.Log("Hat attached to " + avatar.name);
 
         SpawnEffects(AudioPrefab, avatar.GetComponentInChildren<FloatingAvatar>().torso.position);
+    }
+
+    private void SetLayerRecursively(GameObject obj, int newLayer)
+    {
+        if (obj == null)
+        {
+            return;
+        }
+
+        obj.layer = newLayer;
+
+        foreach (Transform child in obj.transform)
+        {
+            if (child != null)
+            {
+                SetLayerRecursively(child.gameObject, newLayer);
+            }
+        }
     }
 
     public void ProcessMessage(ReferenceCountedSceneGraphMessage message)
